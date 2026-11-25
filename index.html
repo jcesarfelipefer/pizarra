@@ -1057,7 +1057,7 @@ function sesEjemplos(){S.sesiones=S.sesiones||[];const hoy=todayS();
 function addSesEj(){const n=sesEjemplos();save();toast(n?n+' sesiones de ejemplo añadidas':'Ya tienes las sesiones de ejemplo');R[tab]&&R[tab]()}
 function quitarSesEj(){S.sesiones=S.sesiones.filter(x=>!x.ejemplo);save();toast('Sesiones de ejemplo quitadas');R[tab]&&R[tab]()}
 
-applyTheme();nav();cargar().then(()=>{S.tareas=S.tareas||[];S.uso=S.uso||[];S.partidos=S.partidos||[];sembrar();if(!S.modeloBenj){modeloBenjamin();save()}if(S.ejemplosWeb!==4){const _n=ejemplosWeb();if(_n)save()}if(S.tacEj!==2&&addTacEj())save();if(!S.sesEj&&sesEjemplos())save();nav();R.inicio()});
+applyTheme();nav();cargar().then(()=>{S.tareas=S.tareas||[];S.uso=S.uso||[];S.partidos=S.partidos||[];sembrar();if(!S.modeloBenj){modeloBenjamin();save()}if(S.ejemplosWeb!==4){const _n=ejemplosWeb();if(_n)save()}if(S.tacEj!==2&&addTacEj())save();if(!S.sesEj&&sesEjemplos())save();if(!S.plantImp){S.plantImp=1;try{importarPlantilla()}catch(e){}}nav();R.inicio()});
 
 /*SW_START*/if('serviceWorker' in navigator&&location.protocol.startsWith('http')){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}/*SW_END*/
 

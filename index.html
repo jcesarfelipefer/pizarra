@@ -933,9 +933,43 @@ function ejemplosWeb(){
   els:[Z(667,375,740,420),C(297,165),C(1037,165),C(297,585),C(1037,585),J(330,375,'C','amarillo'),J(1004,375,'C','amarillo'),J(667,375,'C','amarillo'),...[[480,260],[560,430],[640,300]].map((p,i)=>J(p[0],p[1],i+1,'naranja')),...[[740,330],[820,440],[700,500]].map((p,i)=>J(p[0],p[1],i+1,'azul')),B(500,275),P([495,270],[345,370]),V([560,430],[700,380]),T(667,110,'3v3 + 3 comodines',22)]}
  ];
  defs.push(...defs3);
+
+ const defs4=[
+ {titulo:'Salida con presión: 5 contra 3 hasta la línea de medio campo',tiempo:'12 min',espacio:'40 x 30 m',material:'Portería, conos, petos, balones',contenido:'Salida de balón bajo presión: superar la primera línea',
+  descripcion:'El portero saca en corto a uno de los dos defensas. Portero, 2 defensas y 2 jugadores de banda salen contra 3 rivales que presionan. El objetivo es conducir o pasar con el balón controlado hasta cruzar la línea de medio campo.',
+  normas:'Cruzar la línea con el balón controlado = 1 punto. Si los rivales roban, atacan portería con 3 toques máximo. Rotación de presionadores cada 3 minutos.',
+  correcciones:'El portero mira antes de sacar; los de banda pisan la línea y dan amplitud; si no hay pase, conducir para atraer y soltar; no regalar el balón en la zona de presión.',indicador:'4 salidas limpias en 6 intentos.',
+  variantes:'Más fácil: 5v2. Más difícil: 5v4 con rival adicional.',origen:'https://bcoach.app/ejercicios-futbol-7-tareas-benjamines-alevines/',observaciones:u('https://bcoach.app/ejercicios-futbol-7-tareas-benjamines-alevines/')+' Adaptada de alevín a benjamín: espacio más amplio y presión más suave.',
+  els:[Z(667,375,1000,560),G(150,375,90),J(160,375,'P','verde'),B(190,385),J(320,300,1,'naranja'),J(320,450,2,'naranja'),J(480,190,3,'naranja'),J(480,560,4,'naranja'),J(520,320,'A','azul'),J(520,430,'B','azul'),J(640,375,'C','azul'),R_(667,375,'zon',{w:6,h:560}),P([190,380],[310,305]),V([330,300],[500,200]),T(667,120,'Cruzar la línea de medio campo',22)]},
+ {titulo:'Salida ante presión alta: 3 + mediocentro contra 3',tiempo:'12 min',espacio:'Medio campo de F7',material:'2 miniporterías, conos, petos',contenido:'Salida de balón ante presión alta',
+  descripcion:'Tres jugadores (portero y dos defensas o tres defensas) y un mediocentro salen contra tres rivales que presionan en su zona. Deben superar la presión y conducir el balón hasta las dos miniporterías del centro del campo contrario.',
+  normas:'Gol en minipo = 1 punto. Si los rivales roban, pueden finalizar en la portería propia del equipo que sale. Series de 3 minutos con cambio de roles.',
+  correcciones:'Mediocentro entre líneas y de cara; defensas en distintos lados; evitar pases hacia el propio portero si hay presión cerca.',indicador:'2 goles por serie.',
+  variantes:'Dar 2 puntos si el gol sale tras pase al mediocentro.',origen:'https://aprendeentrenando.com/salida-de-balon-futbol-7-guia/',observaciones:u('https://aprendeentrenando.com/salida-de-balon-futbol-7-guia/'),
+  els:[Z(667,375,1000,560),G(150,375,90),M(1184,300,90),M(1184,450,90),J(160,375,'P','verde'),B(190,385),J(320,260,1,'naranja'),J(320,490,2,'naranja'),J(540,375,'M','naranja'),J(460,300,'A','azul'),J(460,450,'B','azul'),J(650,375,'C','azul'),P([190,380],[310,270]),V([330,265],[530,370]),T(667,110,'Superar la presión y llegar a minis',22)]},
+ {titulo:'Salida contra dos delanteros con pivote',tiempo:'10 min',espacio:'30 x 25 m',material:'Conos, petos, balones',contenido:'Salida con pivote como destino del pase',
+  descripcion:'Portero y dos defensas salen contra dos delanteros que presionan. Un pivote situado en una zona intermedia es el destino del pase. Cuando el pivote recibe y gira, el equipo ha superado la presión.',
+  normas:'Pase al pivote controlado = 1 punto. Si los delanteros roban, intentan marcar en minipo. Rotación de roles cada 2 minutos.',
+  correcciones:'Separarse para abrir línea de pase; pase raso y firme al pivote; el pivote recibe perfilado y orienta el control.',indicador:'5 pases al pivote por serie.',
+  variantes:'Añadir un segundo pivote.',origen:'https://tokkafutbol.com/blog/salida-de-balon-futbol-base/',observaciones:u('https://tokkafutbol.com/blog/salida-de-balon-futbol-base/'),
+  els:[Z(667,375,800,500),G(150,375,90),J(160,375,'P','verde'),B(190,385),J(330,280,1,'naranja'),J(330,470,2,'naranja'),J(480,320,'A','azul'),J(480,430,'B','azul'),J(820,375,'Pi','amarillo'),M(1100,375,90),P([190,380],[320,290]),V([340,285],[800,360]),T(667,110,'Salida y pase al pivote',22)]},
+ {titulo:'Salida con progresión a portería',tiempo:'12 min',espacio:'40 x 30 m',material:'2 porterías F7, conos, petos',contenido:'Salida y finalización tras superar la presión',
+  descripcion:'El equipo sale desde el portero con tres defensas y dos jugadores adelantados contra tres rivales que presionan. Al superar la presión, deben finalizar en la portería contraria.',
+  normas:'Gol tras salida limpia = 2 puntos. Si los rivales roban, un solo ataque corto a minipo. Series de 4 minutos.',
+  correcciones:'Salir con calma y sin prisa; cuando hay presión alta, dar un pase seguro a la banda; los dos de arriba se mueven para recibir.',indicador:'3 goles tras salida por serie.',
+  variantes:'Reducir a 4v3.',origen:'https://cursosdefutbol.pro/blog/ejercicios-futbol-7',observaciones:u('https://cursosdefutbol.pro/blog/ejercicios-futbol-7'),
+  els:[Z(667,375,1000,560),G(150,375,90),G(1184,375,90),J(160,375,'P','verde'),B(190,385),J(330,220,1,'naranja'),J(330,375,2,'naranja'),J(330,530,3,'naranja'),J(740,300,4,'naranja'),J(740,450,5,'naranja'),J(480,290,'A','azul'),J(480,460,'B','azul'),J(620,375,'C','azul'),J(1184,375,'P','verde'),P([190,380],[320,230]),V([340,225],[720,290]),T(667,110,'Salir y finalizar en portería',22)]},
+ {titulo:'Partido 6v6: superar la primera presión',tiempo:'16 min',espacio:'40 x 30 m',material:'2 porterías F7, conos, petos',contenido:'Salida de balón en juego real',
+  descripcion:'Partido 6v6 con porteros. Cada equipo solo puede presionar la salida rival cuando el balón está en su zona de presión (primer tercio del campo contrario). El equipo que sale intenta superar esa zona con pases o conducción.',
+  normas:'2 series de 8 minutos. Superar la zona de presión con el balón controlado = 1 punto. Gol = 2 puntos. Saque de portero con la mano o pie al apoyo.',
+  correcciones:'Dar ángulos y opciones al que tiene el balón; atraer la presión y soltar al libre; el portero no se queda solo, siempre hay un apoyo.',indicador:'3 superaciones de presión por serie.',
+  variantes:'Reducir la zona de presión a un cuarto del campo.',origen:'https://futbolsesion.com/ejercicios-futbol/salida-de-balon/',observaciones:u('https://futbolsesion.com/ejercicios-futbol/salida-de-balon/'),
+  els:[Z(667,375,1000,560),R_(334,375,'zon',{w:320,h:560}),R_(1000,375,'zon',{w:320,h:560}),G(150,375,90),G(1184,375,90),J(150,375,'P','verde'),J(1184,375,'P','verde'),...[[300,260],[300,490],[500,200],[500,375],[500,550],[780,375]].map((p,i)=>J(p[0],p[1],i+1,'naranja')),...[[1034,260],[1034,490],[834,200],[834,375],[834,550],[580,330]].map((p,i)=>J(p[0],p[1],i+1,'azul')),B(520,385),T(334,110,'Zona de presión',20),T(1000,110,'Zona de presión',20)]}
+ ];
+ defs.push(...defs4);
  S.tareas=S.tareas||[];let n=0;
  defs.forEach(d=>{if(S.tareas.some(t=>t.titulo===d.titulo))return;const t={id:id(),...base,...d};S.tareas.push(t);logUso(t,'Añadida desde internet',d.origen||'');n++});
- S.ejemplosWeb=3;return n}
+ S.ejemplosWeb=4;return n}
 function addEjemplos(){const n=ejemplosWeb();save();toast(n?n+' tareas de ejemplo añadidas al histórico':'Ya tenías todas las tareas de ejemplo');if(tab==='datos')R.datos()}
 /*EJ_END*/
 
@@ -958,10 +992,10 @@ function editar(col,i){const o=S[col].find(x=>x.id==i);const E=EDS[col];if(!o||!
   Object.assign(o,d);save();closeModal();R[tab]();toast('Cambios guardados')}}
 const btnEd=(c,i)=>`<button class="btn alt sm noprint" onclick="editar('${c}','${i}')">Editar</button> `;
 {const _p=R.pruebas;R.pruebas=function(){_p();const a=document.getElementById('app');if(!S.pruebas.length)return;const L=[...S.pruebas].sort((x,y)=>x.fecha<y.fecha?1:-1);const c=document.createElement('div');c.className='card scroll';c.style.marginTop='16px';c.innerHTML=`<h3>Resultados registrados</h3><table><tr><th>Fecha</th><th>Jugador</th><th>Prueba</th><th>Resultado</th><th></th></tr>${L.map(p=>`<tr><td>${esc(fmt(p.fecha))}</td><td>${esc(jName(p.jug))}</td><td>${esc(p.test)}</td><td>${esc(p.val)}</td><td>${btnEd('pruebas',p.id)}<button class="btn del" onclick="del('pruebas','${p.id}')">Borrar</button></td></tr>`).join('')}</table>`;a.appendChild(c)}}
-{const _d=R.datos;R.datos=function(){_d();const a=document.getElementById('app');const c=document.createElement('div');c.className='card';c.style.marginTop='16px';c.innerHTML=`<h3>Tareas de ejemplo de internet</h3><p class="muted">Añade al histórico 22 tareas adaptadas de fuentes públicas (rondos, posesión, transiciones, finalización, 1-2-3-1, salida de balón y pase y desmarque) con su diagrama. Las que ya tengas no se duplican.</p><button class="btn alt" onclick="addEjemplos()">Añadir tareas de ejemplo</button>`;a.appendChild(c)}}
+{const _d=R.datos;R.datos=function(){_d();const a=document.getElementById('app');const c=document.createElement('div');c.className='card';c.style.marginTop='16px';c.innerHTML=`<h3>Tareas de ejemplo de internet</h3><p class="muted">Añade al histórico 27 tareas adaptadas de fuentes públicas (rondos, posesión, transiciones, finalización, 1-2-3-1, salida de balón, salida con presión y pase y desmarque) con su diagrama. Las que ya tengas no se duplican.</p><button class="btn alt" onclick="addEjemplos()">Añadir tareas de ejemplo</button>`;a.appendChild(c)}}
 /*ED_END*/
 
-applyTheme();nav();cargar().then(()=>{S.tareas=S.tareas||[];S.uso=S.uso||[];S.partidos=S.partidos||[];sembrar();if(!S.modeloBenj){modeloBenjamin();save()}if(S.ejemplosWeb!==3){const _n=ejemplosWeb();if(_n)save()}nav();R.inicio()});
+applyTheme();nav();cargar().then(()=>{S.tareas=S.tareas||[];S.uso=S.uso||[];S.partidos=S.partidos||[];sembrar();if(!S.modeloBenj){modeloBenjamin();save()}if(S.ejemplosWeb!==4){const _n=ejemplosWeb();if(_n)save()}nav();R.inicio()});
 
 /*SW_START*/if('serviceWorker' in navigator&&location.protocol.startsWith('http')){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}/*SW_END*/
 </script>

@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Pizarra · Entrenamientos y preparación física</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%278%27 fill=%27%23047857%27/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%278%27 fill=%27%231f4e8c%27/%3E%3C/svg%3E">
 <script src="vendor/chart.umd.min.js"></script>
-<meta name="theme-color" content="#047857"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-180.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Pizarra">
+<meta name="theme-color" content="#1f4e8c"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-180.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Pizarra">
 <link rel="preconnect" href="https://api.fontshare.com">
 <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&f[]=cabinet-grotesk@700,800&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f4f6f5;--surface:#fff;--surface2:#eef2f0;--ink:#0e1a15;--muted:#5f6f68;--line:#dfe6e2;--accent:#047857;--accent-ink:#fff;--accent-soft:#d9f2e6;--danger:#c42b2b;--shadow:0 1px 2px rgba(14,26,21,.05),0 6px 24px rgba(14,26,21,.06);--r:14px;--side:244px}
-[data-theme=dark]{--bg:#0a0f0d;--surface:#121a17;--surface2:#1a2420;--ink:#e9f1ed;--muted:#8fa299;--line:#24312b;--accent:#34d399;--accent-ink:#04261a;--accent-soft:#12312a;--danger:#f87171;--shadow:0 1px 2px rgba(0,0,0,.4),0 8px 28px rgba(0,0,0,.35)}
+:root{--bg:#f3f5fa;--surface:#fff;--surface2:#ecf0f7;--ink:#0b1b3a;--muted:#5a6a85;--line:#dbe2ee;--accent:#1f4e8c;--accent-ink:#fff;--accent-soft:#dce7f6;--danger:#c42b2b;--shadow:0 1px 2px rgba(11,27,58,.05),0 6px 24px rgba(11,27,58,.07);--r:14px;--side:244px}
+[data-theme=dark]{--bg:#080d18;--surface:#101828;--surface2:#19233a;--ink:#e8eefa;--muted:#92a3c2;--line:#24304a;--accent:#6ea8ff;--accent-ink:#04122b;--accent-soft:#14264a;--danger:#f87171;--shadow:0 1px 2px rgba(0,0,0,.4),0 8px 28px rgba(0,0,0,.35)}
 *{box-sizing:border-box}
 html{color-scheme:light dark}
 body{margin:0;font-family:Satoshi,system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
@@ -65,10 +65,10 @@ table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;p
 .kpi-card .ic svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .kpi{font-family:'Cabinet Grotesk',sans-serif;font-size:30px;font-weight:800;line-height:1;letter-spacing:-.5px}
 .kpi-card small{color:var(--muted);font-size:13px}
-.hero{border-radius:20px;padding:26px 28px;margin-bottom:22px;background:linear-gradient(135deg,#065f46,#047857 55%,#0e9f6e);color:#fff;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center;position:relative;overflow:hidden}
+.hero{border-radius:20px;padding:26px 28px;margin-bottom:22px;background:linear-gradient(135deg,#0b1f44,#1f4e8c 60%,#2f6bb5);color:#fff;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center;position:relative;overflow:hidden}
 .hero::after{content:"";position:absolute;right:-60px;top:-40px;width:280px;height:280px;border-radius:50%;border:30px solid rgba(255,255,255,.07)}
 .hero h2{color:#fff;margin:0 0 4px;font-size:30px}.hero p{margin:0;opacity:.85}
-.hero .btn{background:#fff;color:#065f46;margin:0}.hero .btn.alt{background:rgba(255,255,255,.14);color:#fff;border-color:rgba(255,255,255,.3)}
+.hero .btn{background:#fff;color:#0b1f44;margin:0}.hero .btn.alt{background:rgba(255,255,255,.14);color:#fff;border-color:rgba(255,255,255,.3)}
 .hero .acts{display:flex;gap:10px;flex-wrap:wrap;position:relative;z-index:1}
 .scroll{overflow-x:auto}
 .task{display:grid;grid-template-columns:1fr 80px 36px;gap:8px;margin-top:8px}
@@ -102,7 +102,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;p
 .toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:11px 16px;border-radius:12px;font-size:14px;font-weight:500;box-shadow:0 10px 30px rgba(0,0,0,.3);opacity:0;pointer-events:none;transition:all .22s;z-index:50;display:flex;gap:14px;align-items:center}
 .toast.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
 .toast button{background:none;border:0;color:var(--accent);font:inherit;font-weight:700;cursor:pointer;padding:0}
-[data-theme=light] .toast button{color:#34d399}
+[data-theme=light] .toast button{color:#6ea8ff}
 .sk{background:linear-gradient(90deg,var(--surface2) 25%,var(--line) 50%,var(--surface2) 75%);background-size:200% 100%;animation:sh 1.3s infinite;border-radius:12px;height:96px}
 @keyframes sh{to{background-position:-200% 0}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}

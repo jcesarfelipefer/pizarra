@@ -1069,6 +1069,24 @@ R.sesiones=function(){_ses0();const box=document.getElementById('lista');if(!box
  const chip=(k,n,c)=>`<button class="${v===k?'on':''}" onclick="sesVista.tipo='${k}';R.sesiones()">${n} <span class="muted">${k==='todos'?L.length:(g[k]||[]).length}</span></button>`;
  box.innerHTML=`<div class="noprint" style="margin-bottom:10px"><h3 style="margin:0 0 8px">Todas las sesiones por tipo</h3><div class="seg" style="flex-wrap:wrap">${chip('todos','Todas')}${ord.map(k=>chip(k,TIPOSE[k].n)).join('')}</div></div>`+
  ord.filter(k=>v==='todos'||v===k).map(k=>`<h3 style="margin:18px 0 8px"><i style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${TIPOSE[k].c};margin-right:8px"></i>${TIPOSE[k].n} <span class="muted">· ${g[k].length} ${g[k].length==1?'sesión':'sesiones'}</span></h3>`+g[k].map(cardSesion).join('')).join('')};
+
+/* ====== NAVEGACION: ATRAS, GUARDAR Y CANCELAR ====== */
+const navHist=[];let navSkip=false;
+const _go0=go;
+go=function(t){if(!navSkip&&t!==tab&&tab)navHist.push(tab);try{history.pushState({p:1},'')}catch{}_go0(t)};
+function volver(){if(document.getElementById('modal')){closeModal();return}const t=navHist.pop()||'inicio';navSkip=true;try{_go0(t)}finally{navSkip=false}}
+window.addEventListener('popstate',()=>{if(document.getElementById('modal')){closeModal();return}if(navHist.length)volver()});
+function barraAtras(){const a=document.getElementById('app');if(!a)return;let b=document.getElementById('barAtras');
+ if(tab==='inicio'){if(b)b.remove();return}
+ if(!b){b=document.createElement('div');b.id='barAtras';b.className='noprint';b.style.cssText='margin:0 0 10px';b.innerHTML='<button type="button" class="btn alt sm" style="margin:0" onclick="volver()">← Atrás</button>';a.insertBefore(b,a.firstChild)}
+ // Cancelar en formularios de la página
+ a.querySelectorAll('form').forEach(f=>{if(f.querySelector('.btn-cancelar')||!f.querySelector('button:not([type=button]),button.btn:not([type=button])'))return;const sb=[...f.querySelectorAll('button')].find(x=>!x.type||x.type==='submit');if(!sb)return;const c=document.createElement('button');c.type='button';c.className='btn alt btn-cancelar';c.textContent='Cancelar';c.onclick=()=>{f.reset();toast('Cancelado');if(navHist.length&&(tab==='editor'||tab==='sesiones'))volver()};sb.after(' ',c)});
+ if(tab==='editor'){const sv=[...a.querySelectorAll('button')].find(x=>/Guardar (en el hist|cambios)/.test(x.textContent));if(sv&&!a.querySelector('.btn-cancelar-ed')){const c=document.createElement('button');c.type='button';c.className='btn alt btn-cancelar-ed';c.textContent='Cancelar';c.onclick=()=>{ed=null;volver()};sv.after(' ',c)}}}
+new MutationObserver(()=>{const a=document.getElementById('app');if(!a)return;const b=document.getElementById('barAtras');if(tab!=='inicio'&&(!b||a.firstChild!==b)||tab==='inicio'&&b||a.querySelector('form:not(:has(.btn-cancelar))'))barraAtras()}).observe(document.getElementById('app'),{childList:true});
+// Modales: botón Cancelar junto a Guardar
+const _om0=openModal;
+openModal=function(h){_om0(h);const m=document.getElementById('modal');if(!m)return;m.querySelectorAll('form').forEach(f=>{if(f.querySelector('.btn-cancelar'))return;const sb=[...f.querySelectorAll('button')].find(x=>!x.type||x.type==='submit');if(!sb)return;const c=document.createElement('button');c.type='button';c.className='btn alt btn-cancelar';c.textContent='Cancelar';c.onclick=closeModal;sb.after(' ',c)})};
+barraAtras();
 lkPantalla();
 </script>
 </body></html>

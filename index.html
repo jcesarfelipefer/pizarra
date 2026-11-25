@@ -178,6 +178,8 @@ const API=_un?'http://localhost:8000':_raw;
 let _t,MODO='api';
 const lsGet=()=>{try{const v=localStorage.getItem(K);return v?JSON.parse(v):null}catch{return null}};
 const lsSet=()=>{try{localStorage.setItem(K,JSON.stringify(S));return true}catch{return false}};
+const lkGet=()=>{try{const v=localStorage.getItem('pizarra-lock');return v?JSON.parse(v):null}catch{return null}};
+const lkSet=o=>{try{o?localStorage.setItem('pizarra-lock',JSON.stringify(o)):localStorage.removeItem('pizarra-lock');return true}catch{return false}};
 const save=()=>{estado('Guardando…');clearTimeout(_t);_t=setTimeout(async()=>{const ok=lsSet();fsEscribir();gdEscribir();if(MODO!=='api'){estado(ok?'Guardado en este dispositivo':'Sin conexión: no guardado');return}try{const r=await fetch(API+'/api/datos',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(S)});if(!r.ok)throw 0;estado('Guardado')}catch{estado(ok?'Guardado en este dispositivo':'Sin conexión: no guardado')}},400)};
 function estado(t){const e=document.getElementById('estado');if(e){e.textContent=t;e.classList.toggle('warn',/Sin conexi|No se pudieron/.test(t))}}
 async function cargar(){try{const c=new AbortController(),to=setTimeout(()=>c.abort(),2500);const r=await fetch(API+'/api/datos',{signal:c.signal});clearTimeout(to);if(!r.ok)throw 0;const d=await r.json();Object.assign(S,d);MODO='api';estado('Todo al día')}catch{MODO='local';const d=lsGet();if(d)Object.assign(S,d);estado('Guardado en este dispositivo')}}
@@ -1009,8 +1011,8 @@ function addEjemplos(){const n=ejemplosWeb();save();toast(n?n+' tareas de ejempl
 /*EJ_END*/
 
 /*ED_START*/
-function nombreVista(){return (typeof gd!=='undefined'&&gd.nombre)||S.nombre||''}
-function cambiarNombre(){const v=prompt('¿Cómo te llamas?',S.nombre||'');if(v===null)return;S.nombre=v.trim();save();R.inicio()}
+function nombreVista(){const l=lkGet();return S.nombre||(typeof gd!=='undefined'&&gd.nombre)||(l&&l.u?l.u.charAt(0).toUpperCase()+l.u.slice(1):'')||''}
+function cambiarNombre(){openModal(`<div class="mh"><h3>¿Cómo te llamas?</h3><button class="icon-btn" aria-label="Cerrar" onclick="closeModal()">×</button></div><form id="fnom"><label>Tu nombre</label><input name="n" value="${esc(S.nombre||nombreVista())}" placeholder="Ej.: Carlos" autocomplete="off"><button class="btn">Guardar</button> <button type="button" class="btn alt" onclick="S.nombre='';save();closeModal();R.inicio()">Usar el de Google</button></form>`);$('#fnom').onsubmit=e=>{e.preventDefault();S.nombre=new FormData(e.target).get('n').trim();save();closeModal();R.inicio();toast('Nombre guardado')}}
 {const _gi=typeof gdInit==='function'?gdInit:null;if(_gi)gdInit=async function(){await _gi();if(gd.on&&gd.tok&&!gd.nombre){try{const r=await gdApi('https://www.googleapis.com/drive/v3/about?fields=user(displayName)');const j=await r.json();const n=((j.user&&j.user.displayName)||'').split(' ')[0];if(n){gd.nombre=n;if(tab==='inicio')R.inicio()}}catch{}}}}
 
 /* ====== EDITAR EN CUALQUIER PÁGINA ====== */
@@ -1037,5 +1039,24 @@ const btnEd=(c,i)=>`<button class="btn alt sm noprint" onclick="editar('${c}','$
 applyTheme();nav();cargar().then(()=>{S.tareas=S.tareas||[];S.uso=S.uso||[];S.partidos=S.partidos||[];sembrar();if(!S.modeloBenj){modeloBenjamin();save()}if(S.ejemplosWeb!==4){const _n=ejemplosWeb();if(_n)save()}nav();R.inicio()});
 
 /*SW_START*/if('serviceWorker' in navigator&&location.protocol.startsWith('http')){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}/*SW_END*/
+
+/* ====== ACCESO CON USUARIO Y CONTRASEÑA (bloqueo local) ====== */
+async function lkHash(u,p,salt){const t=salt+'|'+u.trim().toLowerCase()+'|'+p;if(window.crypto&&crypto.subtle){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}let h=5381;for(const c of t)h=((h<<5)+h+c.charCodeAt(0))|0;return'x'+h}
+function lkOk(l){return l&&l.ok&&Date.now()-l.ok<30*864e5}
+function lkPantalla(){const l=lkGet();if(!l||lkOk(l)||document.getElementById('lkov'))return;const d=document.createElement('div');d.id='lkov';d.style.cssText='position:fixed;inset:0;z-index:99999;background:var(--bg,#f4f6f5);display:flex;align-items:center;justify-content:center;padding:20px';
+ d.innerHTML=`<form id="lkf" class="card" style="max-width:360px;width:100%"><h2 style="margin-top:0">Pizarra</h2><p class="muted" style="margin-top:-6px">Entra con tu usuario y contraseña.</p><label>Usuario</label><input name="u" autocomplete="username" autocapitalize="none" required><label>Contraseña</label><input name="p" type="password" autocomplete="current-password" required><label style="display:flex;gap:8px;align-items:center;margin-top:12px"><input type="checkbox" name="r" checked style="width:auto"> Mantener la sesión 30 días en este dispositivo</label><p id="lkm" style="color:#c0392b;min-height:20px;margin:8px 0 0"></p><button class="btn" style="width:100%">Entrar</button></form>`;
+ document.body.appendChild(d);d.querySelector('input').focus();
+ d.querySelector('#lkf').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target),h=await lkHash(f.get('u'),f.get('p'),l.s);if(h===l.h&&f.get('u').trim().toLowerCase()===l.u){if(f.get('r'))lkSet({...l,ok:Date.now()});d.remove()}else d.querySelector('#lkm').textContent='Usuario o contraseña incorrectos.'}}
+function lkCerrar(){const l=lkGet();if(l){delete l.ok;lkSet(l)}location.reload()}
+function lkForm(modo){const l=lkGet();openModal(`<div class="mh"><h3>${modo==='quitar'?'Quitar la contraseña':l?'Cambiar usuario o contraseña':'Activar acceso'}</h3><button class="icon-btn" aria-label="Cerrar" onclick="closeModal()">×</button></div><form id="lkc">${l?'<label>Contraseña actual</label><input name="a" type="password" autocomplete="current-password" required>':''}${modo==='quitar'?'':`<label>Usuario</label><input name="u" value="${esc(l?l.u:'')}" autocapitalize="none" autocomplete="username" required><label>Contraseña nueva (mínimo 6 caracteres)</label><input name="p" type="password" minlength="6" autocomplete="new-password" required><label>Repite la contraseña</label><input name="p2" type="password" minlength="6" autocomplete="new-password" required>`}<p id="lkm2" style="color:#c0392b;min-height:20px"></p><button class="btn">${modo==='quitar'?'Quitar':'Guardar'}</button></form>`);
+ $('#lkc').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target),m=$('#lkm2');if(l&&await lkHash(l.u,f.get('a'),l.s)!==l.h){m.textContent='La contraseña actual no es correcta.';return}
+  if(modo==='quitar'){lkSet(null);closeModal();R.datos();toast('Acceso desactivado');return}
+  if(f.get('p')!==f.get('p2')){m.textContent='Las contraseñas no coinciden.';return}const u=f.get('u').trim().toLowerCase(),s=Math.random().toString(36).slice(2)+Date.now().toString(36);
+  lkSet({u,s,h:await lkHash(u,f.get('p'),s),ok:Date.now()});closeModal();R.datos();toast('Acceso activado en este dispositivo')}}
+const _dat0=R.datos;
+R.datos=function(){_dat0();const l=lkGet(),c=document.createElement('div');c.className='card';c.style.marginTop='16px';
+ c.innerHTML=`<h3>Acceso con usuario y contraseña</h3><p class="muted">${l?'Activado en este dispositivo para el usuario <b>'+esc(l.u)+'</b>. Al abrir la app se pedirá la contraseña.':'Protege la app en este dispositivo con un usuario y una contraseña. Si usas la app en varios dispositivos, actívalo en cada uno.'}</p><p class="muted" style="font-size:13px">Importante: es un bloqueo local para que otra persona no abra la app en tu móvil o tu ordenador. No cifra los datos ni sustituye a la seguridad de tu cuenta de Google. Si olvidas la contraseña, hay que borrar los datos del sitio en el navegador (con copia en Google Drive no pierdes nada).</p>${l?'<button class="btn alt" onclick="lkForm()">Cambiar usuario o contraseña</button> <button class="btn alt" onclick="lkCerrar()">Cerrar sesión</button> <button class="btn del" onclick="lkForm(\'quitar\')">Quitar contraseña</button>':'<button class="btn" onclick="lkForm()">Activar acceso</button>'}`;
+ const a=document.getElementById('app');a.appendChild(c)};
+lkPantalla();
 </script>
 </body></html>

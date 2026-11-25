@@ -739,8 +739,12 @@ let gd=(()=>{try{return Object.assign({cid:'',fid:'',on:false},JSON.parse(localS
 gd.tok=null;gd.exp=0;gd.pend=false;gd.busy=false;gd.again=false;
 const gdCfg=()=>{try{localStorage.setItem('pizarra-gd',JSON.stringify({cid:gd.cid,fid:gd.fid,on:gd.on}))}catch{}};
 function gdScript(){return new Promise((ok,ko)=>{if(window.google&&google.accounts&&google.accounts.oauth2)return ok();const s=document.createElement('script');s.src='https://accounts.google.com/gsi/client';s.onload=()=>ok();s.onerror=()=>ko('No se pudo cargar Google');document.head.appendChild(s)})}
-async function gdToken(){if(gd.tok&&Date.now()<gd.exp-60000)return gd.tok;await gdScript();
- return new Promise((ok,ko)=>{const c=google.accounts.oauth2.initTokenClient({client_id:gd.cid,scope:GD_SCOPE,callback:r=>{if(r.error)return ko(r.error);gd.tok=r.access_token;gd.exp=Date.now()+(+r.expires_in||3600)*1000;ok(gd.tok)},error_callback:e=>ko((e&&e.type)||'error')});c.requestAccessToken({prompt:''})})}
+const gdStandalone=()=>navigator.standalone===true||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches);
+function gdGuardaTok(){try{localStorage.setItem('pizarra-gdtok',JSON.stringify({t:gd.tok,e:gd.exp}))}catch{}}
+(function(){try{const h=new URLSearchParams(location.hash.slice(1));if(h.get('access_token')&&h.get('state')==='pizarra-gd'){gd.tok=h.get('access_token');gd.exp=Date.now()+(+h.get('expires_in')||3600)*1000;gdGuardaTok();history.replaceState(null,'',location.pathname+location.search)}else{const g=JSON.parse(localStorage.getItem('pizarra-gdtok')||'null');if(g&&g.t&&g.e>Date.now()+60000){gd.tok=g.t;gd.exp=g.e}}}catch{}})();
+function gdRedir(){const p=new URLSearchParams({client_id:gd.cid,redirect_uri:location.origin+location.pathname,response_type:'token',scope:GD_SCOPE,state:'pizarra-gd',include_granted_scopes:'true',prompt:''});if(!gd.cid)throw new Error('sin cid');p.delete('prompt');gdCfg();location.href='https://accounts.google.com/o/oauth2/v2/auth?'+p;return new Promise(()=>{})}
+async function gdToken(){if(gd.tok&&Date.now()<gd.exp-60000)return gd.tok;if(gdStandalone())return gdRedir();await gdScript();
+ return new Promise((ok,ko)=>{const c=google.accounts.oauth2.initTokenClient({client_id:gd.cid,scope:GD_SCOPE,callback:r=>{if(r.error)return ko(r.error);gd.tok=r.access_token;gd.exp=Date.now()+(+r.expires_in||3600)*1000;gdGuardaTok();ok(gd.tok)},error_callback:e=>ko((e&&e.type)||'error')});c.requestAccessToken({prompt:''})})}
 async function gdApi(url,opt){const t=await gdToken();const r=await fetch(url,Object.assign({},opt,{headers:Object.assign({Authorization:'Bearer '+t},(opt&&opt.headers)||{})}));if(!r.ok)throw new Error('Drive '+r.status);return r}
 async function gdBuscar(){const q=encodeURIComponent("name='"+GD_FILE+"' and trashed=false");const r=await gdApi('https://www.googleapis.com/drive/v3/files?q='+q+'&fields=files(id,modifiedTime)&orderBy=modifiedTime desc');const j=await r.json();return(j.files||[])[0]||null}
 async function gdLeer(id){const r=await gdApi('https://www.googleapis.com/drive/v3/files/'+id+'?alt=media');return r.json()}
@@ -756,7 +760,7 @@ async function gdInit(){if(!gd.on||!gd.cid)return;try{await gdToken();const f=gd
  catch(e){gd.pend=true;const el=document.getElementById('estado');if(el){el.textContent='Pulsa aquí para reconectar Google Drive';el.classList.add('warn');el.style.cursor='pointer';el.onclick=gdReconectar}}}
 async function gdReconectar(){try{gd.pend=false;gd.tok=null;await gdToken();const f=gd.fid?{id:gd.fid}:await gdBuscar();if(f){gd.fid=f.id;const d=await gdLeer(f.id);if(d&&d.jugadores)Object.assign(S,d)}const el=document.getElementById('estado');if(el){el.onclick=null;el.style.cursor='';el.classList.remove('warn')}gdCfg();estado('Sincronizado con Google Drive');nav();R[tab]();toast('Google Drive reconectado')}catch(e){gd.pend=true;toast('No se pudo conectar con Google')}}
 async function gdConectar(){const v=(document.getElementById('gdcid')||{}).value||'';gd.cid=v.trim();if(!/\.apps\.googleusercontent\.com$/.test(gd.cid)){toast('El ID de cliente debe acabar en .apps.googleusercontent.com');return}
- try{gd.tok=null;await gdToken();const f=await gdBuscar();let cargarDe=false;if(f){gd.fid=f.id;cargarDe=confirm('Ya hay datos de Pizarra en tu Google Drive.\n\nAceptar: cargarlos (sustituyen a los actuales).\nCancelar: conservar los actuales y sobrescribir Drive con ellos.');if(cargarDe){const d=await gdLeer(f.id);if(d&&d.jugadores)Object.assign(S,d)}}
+ try{gd.on=true;gdCfg();gd.tok=null;await gdToken();const f=await gdBuscar();let cargarDe=false;if(f){gd.fid=f.id;cargarDe=confirm('Ya hay datos de Pizarra en tu Google Drive.\n\nAceptar: cargarlos (sustituyen a los actuales).\nCancelar: conservar los actuales y sobrescribir Drive con ellos.');if(cargarDe){const d=await gdLeer(f.id);if(d&&d.jugadores)Object.assign(S,d)}}
   gd.on=true;gdCfg();await gdEscribir();R.datos();toast('Google Drive conectado')}catch(e){toast('No se pudo conectar: revisa el ID de cliente y los orígenes autorizados')}}
 function gdQuitar(){gd.on=false;gd.fid='';gd.tok=null;gdCfg();try{google.accounts.oauth2.revoke(gd.tok)}catch{}R.datos();toast('Google Drive desconectado (el archivo sigue en tu Drive)')}
 {const _d1=R.datos;R.datos=function(){_d1();const a=document.getElementById('app');const c=document.createElement('div');c.className='card';c.style.marginTop='16px';
@@ -764,12 +768,13 @@ function gdQuitar(){gd.on=false;gd.fid='';gd.tok=null;gdCfg();try{google.account
  <p>${gd.on?`<span class="tag">Conectado</span> ${gd.pend?'<span class="tag am">Pendiente de reconectar</span>':''}`:'<span class="tag o">Sin conectar</span>'}</p>
  <label>ID de cliente de Google</label><input id="gdcid" placeholder="123456-abc.apps.googleusercontent.com" value="${esc(gd.cid)}">
  <div class="row" style="margin-top:8px"><button class="btn" onclick="gdConectar()">${gd.on?'Reconectar':'Conectar con Google Drive'}</button>${gd.on?'<button class="btn alt" onclick="gdEscribir().then(()=>toast(\'Guardado en Drive\'))">Guardar ahora</button><button class="btn del" onclick="gdQuitar()">Desconectar</button>':''}</div>
- <details style="margin-top:12px"><summary><b>Cómo conseguir el ID de cliente (una sola vez, 5 minutos)</b></summary><ol style="line-height:1.6">
+ ${gdStandalone()?'<p><span class="tag am">Modo icono: se abrirá Google en esta misma pantalla y volverás aquí.</span></p>':''}<details style="margin-top:12px"><summary><b>Cómo conseguir el ID de cliente (una sola vez, 5 minutos)</b></summary><ol style="line-height:1.6">
  <li>Entra en <b>console.cloud.google.com</b> con tu cuenta de Google y crea un proyecto nuevo (nombre: Pizarra).</li>
  <li>Menú «APIs y servicios», «Biblioteca»: busca <b>Google Drive API</b> y pulsa «Habilitar».</li>
  <li>«Pantalla de consentimiento de OAuth»: tipo <b>Externo</b>, nombre «Pizarra», tu correo. En «Usuarios de prueba» añade tu propio correo.</li>
  <li>«Credenciales», «Crear credenciales», «ID de cliente de OAuth», tipo <b>Aplicación web</b>.</li>
  <li>En «Orígenes de JavaScript autorizados» añade exactamente: <b>${esc(location.origin)}</b></li>
+ <li>Para usarlo desde el icono del iPhone, añade también en «URI de redireccionamiento autorizados»: <b>${esc(location.origin+location.pathname)}</b></li>
  <li>Crea y copia el ID de cliente (termina en .apps.googleusercontent.com). Pégalo arriba y pulsa «Conectar».</li>
  <li>Google avisará de que la app no está verificada: pulsa «Configuración avanzada» y «Continuar». Es normal porque es tuya y está en modo de prueba.</li></ol></details>`;a.appendChild(c)}}
 {const _c1=cargar;cargar=async function(){await _c1();if(MODO==='local')await gdInit()}}

@@ -1037,7 +1037,27 @@ const btnEd=(c,i)=>`<button class="btn alt sm noprint" onclick="editar('${c}','$
 {const _d=R.datos;R.datos=function(){_d();const a=document.getElementById('app');const c=document.createElement('div');c.className='card';c.style.marginTop='16px';c.innerHTML=`<h3>Tareas de ejemplo de internet</h3><p class="muted">Añade al histórico 27 tareas adaptadas de fuentes públicas (rondos, posesión, transiciones, finalización, 1-2-3-1, salida de balón, salida con presión y pase y desmarque) con su diagrama. Las que ya tengas no se duplican.</p><button class="btn alt" onclick="addEjemplos()">Añadir tareas de ejemplo</button>`;a.appendChild(c)}}
 /*ED_END*/
 
-applyTheme();nav();cargar().then(()=>{S.tareas=S.tareas||[];S.uso=S.uso||[];S.partidos=S.partidos||[];sembrar();if(!S.modeloBenj){modeloBenjamin();save()}if(S.ejemplosWeb!==4){const _n=ejemplosWeb();if(_n)save()}if(S.tacEj!==2&&addTacEj())save();nav();R.inicio()});
+
+/* ====== SESIONES DE EJEMPLO POR TIPO ====== */
+function sesEjemplos(){S.sesiones=S.sesiones||[];const hoy=todayS();
+ const T=(t,m)=>({t,m,tid:''}),C=[T('Calentamiento: movilidad y rondo suave',12)],V=[T('Vuelta a la calma: estiramientos y charla',8)];
+ const defs=[
+  ['ofe',-9,'Ataque: finalizar tras regate',[T('Finalización: 2v1 hacia portería con remate',25),T('Ataque en superioridad 3v2 y gol',20)]],
+  ['ofe',4,'Ataque: desmarque y progresión',[T('Desmarque de apoyo y ruptura hacia portería',22),T('Progresión en superioridad 4v3 con finalización',23)]],
+  ['def',-6,'Defensa: presión y recuperación',[T('Presión tras pérdida: robo en 5 segundos',22),T('Repliegue y cierre de líneas defensivas',23)]],
+  ['def',6,'Defensa: 1v1 defensivo y cobertura',[T('1v1 defensivo: bloqueo y marca individual',20),T('Cobertura y vigilancia del lado contrario',25)]],
+  ['con',-3,'Control: posesión y pase',[T('Rondo 4v2: control, pase y toque limitado',22),T('Juego de posición: posesión y recepción orientada',23)]],
+  ['con',8,'Control: conducción y dominio',[T('Conducción con dominio del balón y técnica individual',22),T('Posesión 5v5 con precisión de pase',23)]],
+  ['fis',-12,'Preparación física: velocidad y agilidad',[T('Circuito de agilidad y coordinación',20),T('Velocidad y aceleración con reacción a la señal',25)]],
+  ['fis',11,'Preparación física: fuerza y resistencia',[T('Circuito de fuerza con saltos y core',22),T('Resistencia intermitente con balón',23)]],
+  ['cal',-1,'Sesión corta de activación',[]]
+ ];let n=0;
+ defs.forEach(([k,d,obj,P])=>{if(S.sesiones.some(x=>x.obj===obj))return;S.sesiones.push({id:id(),fecha:addD(hoy,d),hora:'18:00',dur:k==='cal'?30:75,cat:'Benjamín',obj,micro:'',mat:'Balones, conos, petos',parts:{c:C.map(x=>({...x})),p:P.map(x=>({...x})),v:V.map(x=>({...x}))},ejemplo:1});n++});
+ S.sesEj=1;return n}
+function addSesEj(){const n=sesEjemplos();save();toast(n?n+' sesiones de ejemplo añadidas':'Ya tienes las sesiones de ejemplo');R[tab]&&R[tab]()}
+function quitarSesEj(){S.sesiones=S.sesiones.filter(x=>!x.ejemplo);save();toast('Sesiones de ejemplo quitadas');R[tab]&&R[tab]()}
+
+applyTheme();nav();cargar().then(()=>{S.tareas=S.tareas||[];S.uso=S.uso||[];S.partidos=S.partidos||[];sembrar();if(!S.modeloBenj){modeloBenjamin();save()}if(S.ejemplosWeb!==4){const _n=ejemplosWeb();if(_n)save()}if(S.tacEj!==2&&addTacEj())save();if(!S.sesEj&&sesEjemplos())save();nav();R.inicio()});
 
 /*SW_START*/if('serviceWorker' in navigator&&location.protocol.startsWith('http')){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}/*SW_END*/
 
@@ -1181,6 +1201,7 @@ new MutationObserver(()=>{const a=document.getElementById('app');if(!a)return;co
 const _om0=openModal;
 openModal=function(h){_om0(h);const m=document.getElementById('modal');if(!m)return;m.querySelectorAll('form').forEach(f=>{if(f.querySelector('.btn-cancelar'))return;const sb=[...f.querySelectorAll('button')].find(x=>!x.type||x.type==='submit');if(!sb)return;const c=document.createElement('button');c.type='button';c.className='btn alt btn-cancelar';c.textContent='Cancelar';c.onclick=closeModal;sb.after(' ',c)})};
 barraAtras();
+{const _s=R.sesiones;R.sesiones=function(){_s();const a=document.getElementById('app');if(!a)return;const p=document.createElement('p');p.className='muted';p.style.marginTop='14px';p.innerHTML='<a style="cursor:pointer;text-decoration:underline" onclick="addSesEj()">Añadir sesiones de ejemplo de cada tipo</a> · <a style="cursor:pointer;text-decoration:underline" onclick="quitarSesEj()">Quitar sesiones de ejemplo</a>';a.appendChild(p)}}
 lkPantalla();
 </script>
 </body></html>

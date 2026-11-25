@@ -899,9 +899,43 @@ function ejemplosWeb(){
   els:[Z(667,375,1000,560),Z(667,375,160,560),G(150,375,90),G(1184,375,90),J(150,375,'P','verde'),J(1184,375,'P','verde'),...[[300,260],[300,490],[500,200],[500,375],[500,550],[780,375]].map((p,i)=>J(p[0],p[1],i+1,'naranja')),...[[1034,260],[1034,490],[834,200],[834,375],[834,550],[560,330]].map((p,i)=>J(p[0],p[1],i+1,'azul')),B(520,385),T(667,375,'Zona objetivo',22),T(667,110,'6v6 · salida y recepción de cara',22)]}
  ];
  defs.push(...defs2);
+
+ const defs3=[
+ {titulo:'Pase al hueco por parejas',tiempo:'10 min',espacio:'Zona de 15 x 15 m con puertas de conos',material:'Conos, 1 balón por pareja',contenido:'Pase al espacio y desmarque (inicio del movimiento)',
+  descripcion:'Por parejas. El receptor se mueve hacia una zona libre y el pasador envía un pase raso entre dos conos para que el compañero lo alcance sin pararse. Después se cambian las funciones.',
+  normas:'Pase por la puerta = 1 punto. Se cambian los roles tras cada intento. Cada pareja elige la puerta que quiere antes de empezar y lo dice en voz alta.',
+  correcciones:'El pasador mira cuándo arranca el compañero; fuerza justa; el receptor acompaña la trayectoria del balón y controla después de la puerta.',indicador:'6 de 10 pases bien dados.',
+  variantes:'Añadir un defensor pasivo; ampliar la distancia.',origen:'https://formadorfutbol.com/tarea/pase-al-hueco-desmarque/',observaciones:u('https://formadorfutbol.com/tarea/pase-al-hueco-desmarque/'),
+  els:[Z(667,375,600,420),C(560,300),C(660,300),C(760,300),C(860,300),C(560,450),C(660,450),C(760,450),C(860,450),J(500,240,1,'naranja'),B(525,250),J(560,580,2,'naranja'),J(820,240,3,'azul'),B(845,250),J(880,580,4,'azul'),P([520,250],[610,370]),V([560,570],[600,430]),P([840,250],[810,370]),V([880,570],[830,430]),T(667,150,'Pase por las puertas',22)]},
+ {titulo:'Rondo 3v1 en triángulo: pasa y muévete',tiempo:'10 min',espacio:'Triángulo de 8 m de lado',material:'Conos, petos, balones',contenido:'Pase raso, apoyo y movimiento tras el pase',
+  descripcion:'Tres jugadores en los vértices de un triángulo conservan el balón contra uno dentro. Después de cada pase, el que pasa se mueve para ofrecer una nueva línea de pase.',
+  normas:'Toques libres. Si el defensor toca el balón, cambia con quien lo perdió. 2 minutos por ronda, cada uno es defensor al menos una vez.',
+  correcciones:'No quedarse mirando después de pasar; pase raso y a la pierna cómoda del compañero; moverse cuando el defensor tapa una línea.',indicador:'12 pases seguidos por ronda.',
+  variantes:'Triángulo más pequeño; limitar a 2 toques.',origen:'https://mainakesport.com/blogs/noticias/rondos-futbol',observaciones:u('https://mainakesport.com/blogs/noticias/rondos-futbol')+' Ver también https://entrenamientosdeportivos.com/rondo-3-contra-1-para-ninos/',
+  els:[C(667,230),C(500,520),C(834,520),J(667,250,1,'naranja'),J(520,500,2,'naranja'),J(814,500,3,'naranja'),J(667,410,'D','azul'),B(690,260),P([675,258],[820,490]),F(800,500,700,330,'solida','amarillo'),T(667,170,'Pasa y muévete',24)]},
+ {titulo:'Desmarque y tiro 1v1 entre dos porterías',tiempo:'12 min',espacio:'20 x 15 m',material:'2 porterías pequeñas, balones, conos',contenido:'Desmarque para recibir y finalizar',
+  descripcion:'Un atacante y un defensor juegan entre dos porterías con porteros. El atacante se desmarca del defensor, recibe el balón del entrenador o de un compañero desde fuera y puede tirar a cualquiera de las dos porterías.',
+  normas:'Series de 3 balones y cambio de roles. Gol = 1 punto. El defensor puede puntuar si roba y marca.',
+  correcciones:'Moverse antes de pedir el balón; separarse del defensor con un cambio de ritmo; recibir mirando a la portería; pedir el balón con la voz.',indicador:'2 tiros en cada serie.',
+  variantes:'2v2 con dos pasadores externos.',origen:'https://areacopa.com/es/blog/ejercicios-futbol-7-benjamin-alevin',observaciones:u('https://areacopa.com/es/blog/ejercicios-futbol-7-benjamin-alevin'),
+  els:[Z(667,375,740,400),G(300,375,90),G(1034,375,90),J(300,375,'P','verde'),J(1034,375,'P','verde'),J(620,360,1,'naranja'),J(700,420,'D','azul'),J(667,160,'E','amarillo'),B(690,170),V([620,380],[780,320]),P([680,175],[790,320]),T(667,110,'Desmarque, recibir y tirar',22)]},
+ {titulo:'Desmarque de apoyo y de ruptura en tres',tiempo:'12 min',espacio:'30 x 20 m hasta portería',material:'Portería, conos, balones',contenido:'Desmarque de apoyo, desmarque de ruptura, finalización',
+  descripcion:'Tres jugadores combinan. El jugador 4 pasa raso al 5, que hace un desmarque de apoyo para recibir. El 5 envía un pase al 1, que llega en ruptura y dispara a portería. Se rotan las posiciones.',
+  normas:'Primero sin oposición y luego con un defensor pasivo. Gol o tiro entre palos = 1 punto. Cambio de posiciones cada 4 intentos.',
+  correcciones:'El de apoyo llega a recibir de cara; la ruptura sale cuando el balón ya ha llegado al de apoyo; pasar al espacio, no a los pies.',indicador:'5 de 10 remates entre palos.',
+  variantes:'Añadir un defensor activo.',origen:'https://entrenamientosdefutbol.es/objetivo-ayudas-permanentes',observaciones:u('https://entrenamientosdefutbol.es/objetivo-ayudas-permanentes')+' Concepto de apoyo y ruptura: https://afopro.com/2018/09/03/desmarque-de-apoyo-o-ruptura/',
+  els:[G(667,95,0),J(667,125,'P','verde'),J(520,600,4,'naranja'),B(548,610),J(667,430,5,'naranja'),J(820,500,1,'naranja'),C(667,330),C(560,330),C(780,330),P([548,590],[650,440]),V([667,410],[640,320]),P([680,420],[780,310]),V([820,480],[760,250]),T(667,700,'Pase · apoyo · ruptura · tiro',22)]},
+ {titulo:'3v3 + 3 comodines: progresión en profundidad',tiempo:'14 min',espacio:'30 x 20 m',material:'Conos, petos de 3 colores, balones',contenido:'Pase, apoyo y desmarque de ruptura',
+  descripcion:'3v3 con un comodín dentro de la zona y dos comodines en los lados cortos que juegan con el equipo que tiene el balón. El objetivo es conservar el balón y hacerlo llegar de un comodín al otro mediante pases.',
+  normas:'Cada llegada de comodín a comodín = 1 punto. Los comodines no pueden ser defendidos. Rotar comodines cada 2 minutos.',
+  correcciones:'Mover la defensa con el balón y buscar el pase al espacio libre; el compañero se desmarca en diagonal; levantar la cabeza antes de pasar.',indicador:'6 puntos por equipo por serie.',
+  variantes:'Pedir un pase al comodín interior antes de llegar al del fondo.',origen:'https://es.scribd.com/document/579874614/futbol-7',observaciones:u('https://es.scribd.com/document/579874614/futbol-7'),
+  els:[Z(667,375,740,420),C(297,165),C(1037,165),C(297,585),C(1037,585),J(330,375,'C','amarillo'),J(1004,375,'C','amarillo'),J(667,375,'C','amarillo'),...[[480,260],[560,430],[640,300]].map((p,i)=>J(p[0],p[1],i+1,'naranja')),...[[740,330],[820,440],[700,500]].map((p,i)=>J(p[0],p[1],i+1,'azul')),B(500,275),P([495,270],[345,370]),V([560,430],[700,380]),T(667,110,'3v3 + 3 comodines',22)]}
+ ];
+ defs.push(...defs3);
  S.tareas=S.tareas||[];let n=0;
  defs.forEach(d=>{if(S.tareas.some(t=>t.titulo===d.titulo))return;const t={id:id(),...base,...d};S.tareas.push(t);logUso(t,'Añadida desde internet',d.origen||'');n++});
- S.ejemplosWeb=2;return n}
+ S.ejemplosWeb=3;return n}
 function addEjemplos(){const n=ejemplosWeb();save();toast(n?n+' tareas de ejemplo añadidas al histórico':'Ya tenías todas las tareas de ejemplo');if(tab==='datos')R.datos()}
 /*EJ_END*/
 
@@ -924,10 +958,10 @@ function editar(col,i){const o=S[col].find(x=>x.id==i);const E=EDS[col];if(!o||!
   Object.assign(o,d);save();closeModal();R[tab]();toast('Cambios guardados')}}
 const btnEd=(c,i)=>`<button class="btn alt sm noprint" onclick="editar('${c}','${i}')">Editar</button> `;
 {const _p=R.pruebas;R.pruebas=function(){_p();const a=document.getElementById('app');if(!S.pruebas.length)return;const L=[...S.pruebas].sort((x,y)=>x.fecha<y.fecha?1:-1);const c=document.createElement('div');c.className='card scroll';c.style.marginTop='16px';c.innerHTML=`<h3>Resultados registrados</h3><table><tr><th>Fecha</th><th>Jugador</th><th>Prueba</th><th>Resultado</th><th></th></tr>${L.map(p=>`<tr><td>${esc(fmt(p.fecha))}</td><td>${esc(jName(p.jug))}</td><td>${esc(p.test)}</td><td>${esc(p.val)}</td><td>${btnEd('pruebas',p.id)}<button class="btn del" onclick="del('pruebas','${p.id}')">Borrar</button></td></tr>`).join('')}</table>`;a.appendChild(c)}}
-{const _d=R.datos;R.datos=function(){_d();const a=document.getElementById('app');const c=document.createElement('div');c.className='card';c.style.marginTop='16px';c.innerHTML=`<h3>Tareas de ejemplo de internet</h3><p class="muted">Añade al histórico 17 tareas adaptadas de fuentes públicas (rondos, posesión, transiciones, finalización, 1-2-3-1 y salida de balón) con su diagrama. Las que ya tengas no se duplican.</p><button class="btn alt" onclick="addEjemplos()">Añadir tareas de ejemplo</button>`;a.appendChild(c)}}
+{const _d=R.datos;R.datos=function(){_d();const a=document.getElementById('app');const c=document.createElement('div');c.className='card';c.style.marginTop='16px';c.innerHTML=`<h3>Tareas de ejemplo de internet</h3><p class="muted">Añade al histórico 22 tareas adaptadas de fuentes públicas (rondos, posesión, transiciones, finalización, 1-2-3-1, salida de balón y pase y desmarque) con su diagrama. Las que ya tengas no se duplican.</p><button class="btn alt" onclick="addEjemplos()">Añadir tareas de ejemplo</button>`;a.appendChild(c)}}
 /*ED_END*/
 
-applyTheme();nav();cargar().then(()=>{S.tareas=S.tareas||[];S.uso=S.uso||[];S.partidos=S.partidos||[];sembrar();if(!S.modeloBenj){modeloBenjamin();save()}if(S.ejemplosWeb!==2){const _n=ejemplosWeb();if(_n)save()}nav();R.inicio()});
+applyTheme();nav();cargar().then(()=>{S.tareas=S.tareas||[];S.uso=S.uso||[];S.partidos=S.partidos||[];sembrar();if(!S.modeloBenj){modeloBenjamin();save()}if(S.ejemplosWeb!==3){const _n=ejemplosWeb();if(_n)save()}nav();R.inicio()});
 
 /*SW_START*/if('serviceWorker' in navigator&&location.protocol.startsWith('http')){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}/*SW_END*/
 </script>

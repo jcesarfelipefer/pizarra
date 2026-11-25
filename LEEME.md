@@ -35,3 +35,6 @@ En la pestaña Datos, apartado "Google Drive", sigue los pasos desplegables para
 
 ## Si luego quieres datos compartidos entre dispositivos
 Cloudflare Pages con base de datos D1 (plan gratuito), Supabase o Firebase. Pídemelo y adapto la app.
+
+## Actualización: icono y modo sin conexión
+Sube TODOS los archivos de esta carpeta al repositorio (incluidos icon-*.png, manifest.webmanifest y sw.js). Abre la web una vez con conexión y luego funcionará sin internet. Si cambias algo y no lo ves, cierra y reabre la app (o sube el número 'pizarra-v1' en sw.js).

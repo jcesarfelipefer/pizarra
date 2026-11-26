@@ -1327,7 +1327,7 @@ function addLigaRV(){S.partidos=S.partidos||[];let n=0;LIGA_RV.forEach(([j,f,h,r
 function addSesEj(){const n=sesEjemplos();sesFisNueva();sesFis3();sesCal5();save();toast(n?n+' sesiones de ejemplo añadidas':'Ya tienes las sesiones de ejemplo');R[tab]&&R[tab]()}
 function quitarSesEj(){S.sesiones=S.sesiones.filter(x=>!x.ejemplo);save();toast('Sesiones de ejemplo quitadas');R[tab]&&R[tab]()}
 
-applyTheme();nav();cargar().then(()=>{S.tareas=S.tareas||[];S.uso=S.uso||[];S.partidos=S.partidos||[];minimizarJug();sembrar();if(!S.modeloBenj){modeloBenjamin();save()}if(S.ejemplosWeb!==4){const _n=ejemplosWeb();if(_n)save()}if(S.tacEj!==2&&addTacEj())save();if(S.sesEj!==2&&sesEjemplos())save();if(!S.sesFis&&sesFisNueva())save();if(!S.sesFis3&&sesFis3())save();if(S.ejOrd!==1){S.ejOrd=1;ordenarEj();save()}if(!S.sesCal5&&sesCal5())save();if(S.cal5F!==1){S.cal5F=1;recolocarCal5();save()}if(!S.plantImp){S.plantImp=1;try{importarPlantilla()}catch(e){}}if(!S.pp28){S.pp28=1;if(addProxPartido())save()}if(S.ligaRV!==1){S.ligaRV=1;addLigaRV();save()}nav();R.inicio()});
+applyTheme();nav();cargar().then(()=>{S.tareas=S.tareas||[];S.uso=S.uso||[];S.partidos=S.partidos||[];minimizarJug();sembrar();if(!S.modeloBenj){modeloBenjamin();save()}if(S.ejemplosWeb!==4){const _n=ejemplosWeb();if(_n)save()}if((S.tacEj||0)<3&&addTacEj())save();if(S.sesEj!==2&&sesEjemplos())save();if(!S.sesFis&&sesFisNueva())save();if(!S.sesFis3&&sesFis3())save();if(S.ejOrd!==1){S.ejOrd=1;ordenarEj();save()}if(!S.sesCal5&&sesCal5())save();if(S.cal5F!==1){S.cal5F=1;recolocarCal5();save()}if(!S.plantImp){S.plantImp=1;try{importarPlantilla()}catch(e){}}if(!S.pp28){S.pp28=1;if(addProxPartido())save()}if(S.ligaRV!==1){S.ligaRV=1;addLigaRV();save()}nav();R.inicio()});
 
 /*SW_START*/if('serviceWorker' in navigator&&location.protocol.startsWith('http')){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}/*SW_END*/
 
@@ -1403,7 +1403,7 @@ function tacEl(e,i,sel){const s=sel?'stroke="#fde047" stroke-width="3"':'';
  return''}
 function tacSvg(els,sel,id_){return`<svg ${id_?`id="${id_}"`:''} viewBox="0 0 600 400" style="width:100%;height:auto;display:block;border-radius:12px;touch-action:none;background:#2f8f46"><defs><marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0L8 4L0 8z" fill="#fff"/></marker><marker id="ahs" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0L8 4L0 8z" fill="#fde047"/></marker></defs>${tacPitch()}${els.map((e,i)=>e.t==='f'?tacEl(e,i,i===sel):'').join('')}${els.map((e,i)=>e.t!=='f'?tacEl(e,i,i===sel):'').join('')}</svg>`}
 R.tacticas=function(){killCharts&&killCharts();S.tacticas=S.tacticas||[];if(tac){tacEditor();return}
- $('#app').innerHTML=`<div class="sec"><h2>Tácticas y estrategias</h2><button class="btn" onclick="tac=nuevaTac();R.tacticas()">+ Nueva táctica</button></div><p class="muted" style="margin-top:-6px">Dibuja jugadas y sistemas en el campo de fútbol 7: mueve jugadores, balón y flechas, y guárdalas para tenerlas siempre a mano.</p>${S.tacticas.length?`<div class="grid">${S.tacticas.map(t=>`<div class="card"><span class="tag am">${esc(t.fase)}</span><div style="margin:10px 0">${tacSvg(t.els,-1)}</div><h3 style="margin:6px 0">${esc(t.nombre||'Sin título')}</h3>${t.desc?`<p class="muted" style="font-size:13px">${esc(t.desc.slice(0,120))}${t.desc.length>120?'…':''}</p>`:''}<button class="btn" onclick="tac=JSON.parse(JSON.stringify(S.tacticas.find(x=>x.id==='${t.id}')));tac.sel=null;R.tacticas()">Abrir y editar</button> <button class="btn alt" onclick="dupTac('${t.id}')">Duplicar</button> <button class="btn del" onclick="delTac('${t.id}')">Borrar</button></div>`).join('')}</div>`:emptyS('Aún no hay tácticas','Crea la primera con «Nueva táctica». Puedes empezar con una formación 1-2-3-1.')}<p class="muted" style="margin-top:14px"><a style="cursor:pointer;text-decoration:underline" onclick="toast(addTacEj()?'Tácticas de ejemplo añadidas':'Ya tienes las tácticas de ejemplo');save();R.tacticas()">Añadir las tácticas de ejemplo: salida de balón 1-2-3-1 contra presión alta y media</a></p>`};
+ $('#app').innerHTML=`<div class="sec"><h2>Tácticas y estrategias</h2><button class="btn" onclick="tac=nuevaTac();R.tacticas()">+ Nueva táctica</button></div><p class="muted" style="margin-top:-6px">Dibuja jugadas y sistemas en el campo de fútbol 7: mueve jugadores, balón y flechas, y guárdalas para tenerlas siempre a mano.</p>${S.tacticas.length?`<div class="grid">${S.tacticas.map(t=>`<div class="card"><span class="tag am">${esc(t.fase)}</span><div style="margin:10px 0">${tacSvg(t.els,-1)}</div><h3 style="margin:6px 0">${esc(t.nombre||'Sin título')}</h3>${t.desc?`<p class="muted" style="font-size:13px">${esc(t.desc.slice(0,120))}${t.desc.length>120?'…':''}</p>`:''}<button class="btn" onclick="tac=JSON.parse(JSON.stringify(S.tacticas.find(x=>x.id==='${t.id}')));tac.sel=null;R.tacticas()">Abrir y editar</button> <button class="btn alt" onclick="dupTac('${t.id}')">Duplicar</button> <button class="btn del" onclick="delTac('${t.id}')">Borrar</button></div>`).join('')}</div>`:emptyS('Aún no hay tácticas','Crea la primera con «Nueva táctica». Puedes empezar con una formación 1-2-3-1.')}<p class="muted" style="margin-top:14px"><a style="cursor:pointer;text-decoration:underline" onclick="toast(addTacEj()?'Tácticas de ejemplo añadidas':'Ya tienes las tácticas de ejemplo');save();R.tacticas()">Añadir 12 tácticas de ejemplo con cómo hacerlas y practicarlas: salida de balón, ataque, defensa, transiciones y balón parado</a></p>`};
 function dupTac(i){const t=S.tacticas.find(x=>x.id===i);if(!t)return;const c=JSON.parse(JSON.stringify(t));c.id=id();c.nombre=(t.nombre||'Táctica')+' (copia)';S.tacticas.push(c);save();toast('Táctica duplicada');R.tacticas()}
 function delTac(i){if(!confirm('¿Borrar esta táctica?'))return;S.tacticas=S.tacticas.filter(x=>x.id!==i);save();R.tacticas()}
 function tacPt(ev){const svg=document.getElementById('tsvg'),p=svg.createSVGPoint();p.x=ev.clientX;p.y=ev.clientY;const q=p.matrixTransform(svg.getScreenCTM().inverse());return{x:Math.max(12,Math.min(588,q.x)),y:Math.max(12,Math.min(388,q.y))}}
@@ -1452,7 +1452,220 @@ function tacEjemplos(){const P=(x,y,eq,n,o)=>({t:'p',x,y,eq,n:String(n),...(o||{
   {t:'b',x:62,y:188},
   F(54,184,96,140,'pase'),F(122,144,188,186,'pase'),F(212,220,232,290,'pase'),F(256,302,326,266,'pase'),F(345,218,345,262,'carrera'),F(262,88,318,100,'carrera'),
   X(70,160,'1'),X(165,150,'2'),X(236,258,'3'),X(300,300,'4'),X(300,40,'Presión media del rival'),X(190,368,'Salida con más tiempo y espacio')]}]}
-function addTacEj(){S.tacticas=S.tacticas||[];let n=0;tacEjemplos().forEach(t=>{if(!S.tacticas.some(x=>x.nombre===t.nombre)){S.tacticas.push({id:id(),sel:null,...t});n++}});S.tacEj=2;return n}
+function tacEjemplos2(){const P=(x,y,eq,n,o)=>({t:'p',x,y,eq,n:String(n),...(o||{})}),F=(x1,y1,x2,y2,st)=>({t:'f',x1,y1,x2,y2,st:st||'pase'}),X=(x,y,s)=>({t:'x',x,y,s}),B=(x,y)=>({t:'b',x,y});
+return[
+{nombre:'Pared (2x1) para superar a un defensa',fase:'Ataque',
+desc:`Qué es: dos atacantes superan a un defensa con un pase y devolución (la pared).
+
+Cómo se hace:
+1) El delantero (7) conduce de cara al defensa rival y lo fija.
+2) Pasa al compañero de apoyo (5) y arranca en carrera por el lado del defensa.
+3) El apoyo (5) devuelve el balón al espacio, a la carrera del delantero, de primeras.
+4) El delantero recibe ya superado el defensa y finaliza o centra.
+
+Cómo practicarla:
+- Fase 1, en parejas sin oposición: pase, carrera y devolución con un cono como defensa. Primero andando, luego a ritmo de partido.
+- Fase 2, 2x1 en un pasillo de unos 15 m: dos atacantes contra un defensa y una mini portería. El defensa empieza pasivo, luego activo.
+- Fase 3, 3x2 y partido reducido 4x4: se puntúa doble el gol que llega tras una pared.
+
+Consignas: el que da el pase arranca enseguida; el apoyo se ofrece perfilado y a buena distancia; devolver al espacio, no al pie; amagar antes del pase para fijar al defensa.
+
+Indicador: completar la pared en al menos 3 de 5 intentos en el 2x1 activo.`,
+els:[P(330,200,'a',7),P(262,262,'a',5),P(415,215,'b',2),P(570,200,'b',1,{gk:true}),B(344,196),
+ F(346,206,276,256,'pase'),F(332,188,440,150,'carrera'),F(276,254,420,170,'pase'),
+ X(300,224,'1'),X(410,130,'2'),X(350,240,'3'),X(300,40,'Pared: pase, carrera y devolución')]},
+{nombre:'Ataque por banda y centro al segundo palo',fase:'Ataque',
+desc:`Qué es: llevar el balón a la banda y finalizar con un centro al área, con llegadas escalonadas.
+
+Cómo se hace (1-2-3-1):
+1) El interior (4) recibe en banda y conduce hacia la línea de fondo.
+2) El delantero (7) se ofrece al primer palo para arrastrar al defensa.
+3) El mediocentro (5) llega desde atrás al segundo palo, por detrás de la defensa.
+4) El otro interior (6) llega al borde del área por si hay rechace.
+5) El interior (4) centra raso o con poca altura al segundo palo.
+
+Cómo practicarla:
+- Fase 1, sin oposición: un jugador por banda y cuatro finalizadores que repiten los movimientos con un balón por turno.
+- Fase 2, con un portero y dos defensas pasivos: se cambia de banda cada ronda y se rota a todos por todos los puestos.
+- Fase 3, partido 5x5 o 6x6: gol por banda y centro vale doble.
+
+Consignas: levantar la cabeza antes de centrar; el delantero no se queda quieto, hace un movimiento al primer palo y rompe al segundo; los que llegan lo hacen en carrera, no parados; alguien siempre queda pendiente del rechace.
+
+Indicador: tres de cinco centros con remate de un compañero.`,
+els:[P(300,60,'a',4),P(335,200,'a',7),P(300,235,'a',5),P(250,320,'a',6),P(470,150,'b',2),P(470,250,'b',3),P(570,200,'b',1,{gk:true}),B(312,54),
+ F(310,60,480,66,'conduccion'),F(490,72,520,228,'pase'),F(338,196,520,172,'carrera'),F(305,235,515,236,'carrera'),F(255,316,430,290,'carrera'),
+ X(400,40,'Conducción y centro'),X(540,150,'1.er palo'),X(540,262,'2.º palo')]},
+{nombre:'Cambio de orientación para salir de la presión',fase:'Ataque',
+desc:`Qué es: pasar el balón de un lado al otro del campo para encontrar el espacio libre cuando el rival se junta en un lado.
+
+Cómo se hace:
+1) El defensa (2) con balón atrae a dos rivales hacia su banda.
+2) Pasa al mediocentro (5), que se ofrece de cara.
+3) El mediocentro abre en largo al interior (6) del lado contrario, libre de marca.
+4) El interior (6) conduce o pasa al delantero (7), que recibe con espacio.
+
+Cómo practicarla:
+- Fase 1, rondo 4x2 en un cuadrado grande: después de cuatro pases seguidos se exige un cambio al jugador del otro lado.
+- Fase 2, juego de posición 5x3 con dos zonas laterales: los dos equipos puntúan si el balón pasa de zona a zona en un cambio.
+- Fase 3, partido con regla: antes de marcar hay que cambiar de lado al menos una vez.
+
+Consignas: atraer primero y soltar después; pase raso y fuerte, al pie del lado libre; el receptor se ofrece abierto y perfilado; el resto mueve para dar amplitud.
+
+Indicador: cambio de lado completado sin pérdida en 3 de 5 intentos.`,
+els:[P(130,130,'a',2),P(235,200,'a',5),P(240,325,'a',6),P(340,270,'a',7),P(190,120,'b',4),P(255,150,'b',5),P(40,200,'a',1,{gk:true}),B(142,138),
+ F(142,142,224,192,'pase'),F(244,212,240,314,'pase'),F(250,320,330,278,'pase'),
+ X(110,170,'1'),X(180,215,'2'),X(255,280,'3'),X(300,40,'Atraer y cambiar de lado')]},
+{nombre:'Bloque medio 1-2-3-1 y basculación',fase:'Defensa',
+desc:`Qué es: el equipo se coloca junto en el centro del campo y se desplaza todo a la vez hacia el lado del balón, cerrando el espacio.
+
+Cómo se hace:
+1) Las tres líneas (defensas, medios y delantero) juntas, sin huecos entre ellas.
+2) El jugador más cercano al balón sale a presionarlo; los demás se mueven hacia ese lado.
+3) El lado contrario se cierra hacia dentro, protegiendo el centro.
+4) Si el rival cambia de lado, todo el bloque bascula en sentido contrario.
+
+Cómo practicarla:
+- Fase 1, sin balón: el entrenador mueve un balón y el equipo se desplaza como una cuerda, con las líneas juntas.
+- Fase 2, 6x4 con comodines: el equipo defensor bascula a la vez que circula el balón.
+- Fase 3, partido 7x7 o 5x5 con regla: si el equipo defensor roba con el bloque bien colocado, gol de contraataque vale doble.
+
+Consignas: el más cercano presiona, los demás cierran pases; líneas juntas, sin dejar espacios por dentro; hablar y avisar; si me pasan, el compañero sale a la cobertura.
+
+Indicador: el rival tarda en llegar a zona de remate y se ve obligado a pasar atrás o por fuera en 3 de 5 ataques.`,
+els:[P(40,200,'a',1,{gk:true}),P(110,150,'a',2),P(110,250,'a',3),P(190,100,'a',4),P(180,200,'a',5),P(190,300,'a',6),P(280,200,'a',7),
+ P(300,125,'b',4),P(340,205,'b',5),P(310,290,'b',6),P(400,100,'b',2),P(400,300,'b',3),P(450,200,'b',7),P(570,200,'b',1,{gk:true}),B(288,132),
+ F(280,200,298,150,'carrera'),F(190,300,200,250,'carrera'),F(180,200,178,168,'carrera'),F(110,250,112,215,'carrera'),
+ X(300,40,'Bloque medio: todos hacia el balón'),X(150,368,'Líneas juntas y bascular')]},
+{nombre:'Presión tras pérdida (primeros 5 segundos)',fase:'Transición ataque-defensa',
+desc:`Qué es: al perder el balón, el equipo intenta recuperarlo en los 5 primeros segundos antes de que el rival se organice.
+
+Cómo se hace:
+1) El jugador más cercano al balón presiona al instante para frenar la salida.
+2) Los compañeros próximos cierran las líneas de pase hacia delante.
+3) Los lejanos cierran el centro y se acercan para ayudar.
+4) Si en 5 segundos no se recupera, todos se repliegan y se organizan.
+
+Cómo practicarla:
+- Fase 1, rondo 4x2 con comodín: quien pierde el balón presiona de inmediato; los jugadores de dentro intentan salir en menos de 5 segundos.
+- Fase 2, 3x3 con dos puertas: al perder, el más cercano frena y los otros cierran pases.
+- Fase 3, 5x5 con regla: si no recuperas en 5 segundos, pierdes un comodín.
+- En benjamín conviene empezar con solo la consigna del jugador más cercano, sin contar segundos, y sesiones cortas de 5 a 8 minutos.
+
+Consignas: el más cercano ataca el balón, los demás cierran pases; presionar sin lanzarse al suelo; hablar entre todos; si el rival supera la presión, repliegue.
+
+Indicador: recuperar el balón antes de 5 segundos en 3 de 8 pérdidas.`,
+els:[P(305,210,'b',3),P(230,200,'a',5),P(255,165,'a',4),P(255,255,'a',6),P(330,140,'a',7),P(200,200,'a',2),P(370,250,'b',4),P(380,150,'b',5),P(40,200,'a',1,{gk:true}),B(318,206),
+ F(262,172,296,200,'carrera'),F(262,252,290,228,'carrera'),F(330,148,345,175,'carrera'),F(200,206,230,206,'carrera'),
+ X(300,40,'Al perder: presión inmediata'),X(300,370,'5 segundos')]},
+{nombre:'Contraataque rápido tras recuperar',fase:'Transición defensa-ataque',
+desc:`Qué es: al recuperar el balón, atacar rápido antes de que el rival tenga la defensa colocada.
+
+Cómo se hace:
+1) El jugador que roba (5) levanta la cabeza y busca el pase hacia delante, no se queda con el balón.
+2) Los dos interiores (4 y 6) rompen en carrera por las bandas.
+3) El delantero (7) fija a los defensas.
+4) Máximo tres o cuatro pases y se finaliza.
+
+Cómo practicarla:
+- Fase 1, oleadas de 3x1 con portero: tres atacantes salen a la señal del entrenador contra un defensa.
+- Fase 2, 3x2 y 4x3 con retorno: los defensores que pierden vuelven corriendo.
+- Fase 3, partido 5x5: el equipo que roba tiene 8 segundos para finalizar; gol de contraataque vale doble.
+
+Consignas: primer pase hacia delante; salir por bandas y por el centro a la vez, sin juntarse; conducir solo si no hay pase; el que lleva el balón decide rápido.
+
+Indicador: llegar a disparo en menos de 8 segundos en 3 de 5 recuperaciones.`,
+els:[P(255,200,'a',5),P(300,90,'a',4),P(310,310,'a',6),P(335,200,'a',7),P(430,205,'b',2),P(480,260,'b',3),P(570,200,'b',1,{gk:true}),B(268,196),
+ F(268,192,350,100,'pase'),F(300,90,430,70,'carrera'),F(310,310,430,320,'carrera'),F(336,206,450,200,'carrera'),
+ X(300,40,'Recuperar y salir rápido'),X(160,230,'Roba'),X(420,370,'3-4 pases como máximo')]},
+{nombre:'Saque de esquina a favor: segundo palo',fase:'Balón parado',
+desc:`Qué es: córner con una jugada preparada para llegar con varios jugadores al área.
+
+Cómo se hace:
+1) El sacador (4) lanza al segundo palo.
+2) El delantero (7) se mueve al primer palo para arrastrar al defensa y después rompe al segundo.
+3) El mediocentro (5) y el interior (6) llegan desde atrás al segundo palo y al rechace.
+4) Otro jugador se queda por detrás de la jugada para cubrir el contraataque.
+
+Variante corta: el sacador pasa al jugador que se ofrece cerca, este le devuelve y el sacador centra.
+
+Cómo practicarla:
+- Fase 1, sin rival: repetir el movimiento con cuatro finalizadores y un sacador, de forma que cada uno conozca su zona.
+- Fase 2, con tres defensas y un portero: se cambia de lado en cada intento.
+- Fase 3, en partido reducido: los córners salen con la jugada acordada y se repasa en el descanso.
+
+Consignas: llegar en carrera, no parado; el sacador pone el balón lejos del portero; nunca todos al área: uno se queda de seguridad; mismo orden de llegada cada vez.
+
+Indicador: tres de cinco córners con remate.`,
+els:[P(578,26,'a',4),P(515,130,'a',7),P(430,170,'a',5),P(450,260,'a',6),P(300,200,'a',2),P(570,200,'b',1,{gk:true}),P(545,165,'b',2),P(530,235,'b',3),B(584,20),
+ F(574,32,505,228,'pase'),F(515,138,520,188,'carrera'),F(432,174,510,208,'carrera'),F(452,256,510,240,'carrera'),
+ X(430,40,'Córner al segundo palo'),X(300,230,'Seguridad')]},
+{nombre:'Defensa del córner en contra',fase:'Balón parado',
+desc:`Qué es: forma de defender un córner del rival con marcas y zonas, dejando un jugador para salir al contraataque.
+
+Cómo se hace:
+1) Un defensa junto a cada poste.
+2) Dos jugadores marcan a los rivales más peligrosos dentro del área.
+3) Un jugador defiende la zona del primer palo y despeja.
+4) Un jugador se queda fuera del área para recoger el rechace y salir.
+5) El portero sale a por el balón solo si lo ve claro; si no, espera en su línea.
+
+Cómo practicarla:
+- Fase 1, sin balón: cada uno aprende a quién marca y dónde se coloca.
+- Fase 2, con saque real y tres atacantes: se corrige la colocación tras cada córner.
+- Fase 3, partido de córners: se reparte la plantilla en tres equipos, con cuatro sacadores. Si el equipo defensor despeja, pasa a atacar.
+
+Consignas: ver siempre a la vez a tu rival y al balón; no te quedes parado, atácalo; despejar fuera del área y a la banda contraria; hablar y avisar de quién sale.
+
+Indicador: despejar o controlar el balón en tres de cinco córners.`,
+els:[P(35,200,'a',1,{gk:true}),P(62,172,'a',2),P(75,232,'a',3),P(115,200,'a',5),P(130,135,'a',4),P(140,270,'a',6),P(255,200,'a',7),
+ P(20,24,'b',4),P(62,118,'b',2),P(95,198,'b',3),P(125,255,'b',5),B(14,18),
+ F(115,206,215,325,'pase'),F(255,206,290,200,'carrera'),
+ X(300,40,'Defensa del córner'),X(220,345,'Despejar a la banda contraria'),X(300,225,'Contra')]},
+{nombre:'Saque de banda con aclarado',fase:'Balón parado',
+desc:`Qué es: saque de banda con una jugada de dos jugadores para crear espacio y recibir con ventaja.
+
+Cómo se hace:
+1) El sacador (4) tiene dos opciones: el compañero cercano (5) o el espacio abierto.
+2) El jugador cercano (5) hace el amago de ofrecerse, tira de un defensa y rompe a la banda.
+3) El jugador alejado (7) hace un desmarque de apoyo, sin balón, hacia la zona central.
+4) El sacador pasa al que queda libre; finalización mediante centro o tiro.
+
+Cómo practicarla:
+- Fase 1, por parejas: un sacador y un receptor que repiten el movimiento de aclarado.
+- Fase 2, con tres jugadores por banda (un sacador y dos que se mueven); el sacador elige una de dos opciones.
+- Fase 3, en partido reducido: se practica con la señal del sacador y se corrige después.
+
+Consignas: moverse a la vez que el sacador mira; amagar antes de romper; el sacador saca de frente, con una parte de cada pie sobre la línea o fuera, y con las manos desde atrás y por encima de la cabeza; no hay gol directo de saque de banda.
+
+Indicador: recepción en ventaja en tres de cinco saques.`,
+els:[P(300,22,'a',4),P(330,75,'a',5),P(400,160,'a',7),P(260,200,'a',6),P(340,95,'b',2),P(405,135,'b',3),P(570,200,'b',1,{gk:true}),B(300,14),
+ F(330,75,308,50,'carrera'),F(304,28,314,62,'pase'),F(400,160,470,125,'carrera'),F(318,66,455,122,'pase'),
+ X(450,40,'Saque con aclarado'),X(380,245,'Apoyo')]},
+{nombre:'Presión alta tras saque de portería rival',fase:'Defensa',
+desc:`Qué es: presionar arriba, cerca de la portería rival, para forzar el error en su salida.
+
+Cómo se hace:
+1) El delantero (7) cierra al portero y a un defensa, empujando la salida hacia una banda.
+2) El interior del lado del balón (4) cierra al defensa de ese lado.
+3) El mediocentro (5) vigila al medio del rival.
+4) Los del lado contrario (6) se cierran hacia dentro, listos para el pase.
+5) Defensas adelantados, atentos a la zona de fuera de juego (línea a 13 m de la meta).
+
+Cómo practicarla:
+- Fase 1, 4x3 con portero: los atacantes presionan en la salida y los rivales tienen que superarlos.
+- Fase 2, 6x5 en medio campo: gol de contra si se roba en tres segundos.
+- Fase 3, partido 7x7: el equipo que presiona arriba marca doble si roba en campo rival.
+- En benjamín, mantén la tarea corta y, si el equipo se parte en dos, vuelve al bloque medio.
+
+Consignas: presionar en bloque, no individualmente; cerrar los pases antes que al jugador con balón; si la presión se supera, repliegue; ojo con los espacios a la espalda.
+
+Indicador: robar o forzar el pase largo en 3 de 6 salidas.`,
+els:[P(555,200,'b',1,{gk:true}),P(500,130,'b',2),P(500,270,'b',3),P(430,200,'b',5),P(40,200,'a',1,{gk:true}),P(480,150,'a',7),P(400,90,'a',4),P(420,310,'a',6),P(350,200,'a',5),P(250,150,'a',2),P(250,250,'a',3),B(543,206),
+ F(480,150,528,188,'carrera'),F(400,90,468,112,'carrera'),F(420,310,480,284,'carrera'),F(350,200,414,203,'carrera'),
+ X(300,40,'Presión alta en bloque'),X(150,368,'Empujar hacia la banda')]}
+]}
+
+function addTacEj(){S.tacticas=S.tacticas||[];let n=0;tacEjemplos().concat(tacEjemplos2()).forEach(t=>{if(!S.tacticas.some(x=>x.nombre===t.nombre)){S.tacticas.push({id:id(),sel:null,...t});n++}});S.tacEj=3;return n}
 
 /* ====== NAVEGACION: ATRAS, GUARDAR Y CANCELAR ====== */
 const navHist=[];let navSkip=false;

@@ -1844,5 +1844,9 @@ function irNuevaSesion(){const f=document.getElementById('f');if(!f)return;f.scr
 /* ====== INICIO: bloque de accesos separado del saludo ====== */
 {const _ri2=R.inicio;R.inicio=function(){_ri2.apply(this,arguments);const h=document.querySelector('#app .hero');const a=h&&h.querySelector('.acts');if(!a||h.classList.contains('hero2'))return;
  const d=document.createElement('div');d.className='hero hero2';d.style.padding='18px 20px';d.innerHTML='<div style="width:100%;position:relative;z-index:1"><p style="font-weight:600;margin:0 0 10px;opacity:.9">Accesos rápidos</p></div>';d.firstChild.appendChild(a);h.after(d);h.style.marginBottom='12px'}}
+
+/* ====== CALENDARIO: botón Nueva sesión ====== */
+function nuevaSesionDesde(){go('sesiones');setTimeout(irNuevaSesion,60)}
+{const _rc=R.calendario;R.calendario=function(){_rc.apply(this,arguments);const h=document.querySelector('#app h2');if(!h||document.getElementById('btnNuevaSesCal'))return;const w=document.createElement('div');w.className='noprint';w.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:0 0 10px';h.style.margin='0';h.before(w);w.appendChild(h);const b=document.createElement('button');b.type='button';b.id='btnNuevaSesCal';b.className='btn';b.style.margin='0';b.innerHTML='<span style="font-size:18px;line-height:1;margin-right:6px">+</span>Nueva sesión';b.onclick=nuevaSesionDesde;w.appendChild(b)}}
 </script>
 </body></html>

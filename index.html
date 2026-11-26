@@ -1911,5 +1911,8 @@ function partidoSemana(){const L=(S.partidos||[]).slice().sort((a,b)=>(a.fecha+(
  const c=document.createElement('div');c.id='partSem';c.className='card';c.style.cssText='margin:0 0 22px;border:2px solid var(--pri,#1f4e8c)';
  c.innerHTML=`<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center"><b style="color:var(--pri,#1f4e8c)">${r.t}</b><span class="muted">${fmt(x.fecha)}${x.hora?' · '+esc(x.hora):''}${cita?' · citación '+esc(cita):''}</span></div><h3 style="margin:8px 0 4px;font-size:20px">${x.sede==='fuera'?'@ ':'vs '}${esc(x.rival)}</h3><div class="muted" style="font-size:13px">${esc(x.comp||'Partido')}${x.sede==='fuera'?' · Fuera':' · En casa'}${jug?' · Resultado '+x.gf+' – '+x.gc:''}</div><div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn" style="margin:0" onclick="prepPartido('${x.id}')">Preparar partido</button><button type="button" class="btn alt" style="margin:0" onclick="pe='${x.id}';R.partidos()">${jug?'Ver partido':'Anotar resultado y minutos'}</button></div>`;
  const sec=a.querySelector('.sec');if(sec)sec.before(c);else a.querySelector('h2').after(c)}}
+
+/* ====== SESIONES: cabecera campo verde ====== */
+{const _rs=R.sesiones;R.sesiones=function(){_rs.apply(this,arguments);const b=document.getElementById('btnNuevaSes');const h=b&&b.parentElement;if(h&&!h.classList.contains('hero')){h.classList.add('hero');h.style.margin='0 0 14px';h.style.padding='20px'}}}
 </script>
 </body></html>

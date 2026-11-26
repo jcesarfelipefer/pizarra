@@ -1165,10 +1165,62 @@ function sesCal5(){S.sesiones=S.sesiones||[];S.tareas=S.tareas||[];const hoy=tod
  defs.forEach(([obj,micro,c,p,v])=>{if(S.sesiones.some(x=>x.obj===obj))return;do{d.setDate(d.getDate()+1)}while(![2,4,5].includes(d.getDay()));const parts={c,p,v};const tot=Object.values(parts).flat().reduce((a,t)=>a+t.m,0);S.sesiones.push({id:id(),fecha:f(d),hora:'18:00',dur:tot,cat:'Benjamín',obj,micro,mat:'Balones, conos, picas, vallas bajas, aros, petos',parts,ejemplo:1});n++});
  S.sesCal5=1;return n}
 
+/* ====== HOJA DE PREPARACIÓN DE PARTIDO (convocatoria para compartir) ====== */
+const ROPA_P=['Camiseta de juego','Pantalón','Medias','Botas','Espinilleras','Botella de agua','Chubasquero o abrigo','Ropa de cambio y chancletas'];
+function prepDe(p){if(!p.prep){const c={};(S.jugadores||[]).forEach(j=>c[j.id]=1);p.prep={cita:'',campo:'',dir:'',mapa:'',ropa:ROPA_P.slice(0,6),ropaExtra:'',equip:'Equipación oficial del club',convoc:c,notas:''}}return p.prep}
+function mapaUrl(P){if(P.mapa&&/^https?:\/\//i.test(P.mapa.trim()))return P.mapa.trim();const q=[P.campo,P.dir].filter(Boolean).join(', ');return q?'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q):''}
+function prepTexto(p){const P=prepDe(p),eq=(S.equipo||'Racing Villaverde'),dias=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'],d=new Date(p.fecha+'T12:00:00');
+ const fe=dias[d.getDay()]+' '+d.getDate()+' de '+d.toLocaleDateString('es-ES',{month:'long'});
+ const cv=(S.jugadores||[]).filter(j=>P.convoc&&P.convoc[j.id]).sort((a,b)=>(+a.dorsal||99)-(+b.dorsal||99));
+ const mp=mapaUrl(P),ropa=[...(P.ropa||[]),...(P.ropaExtra?[P.ropaExtra]:[])];
+ const L=['CONVOCATORIA - '+eq+' Benjamín',(p.comp?p.comp+'\n':'')+(p.sede==='fuera'?'Jugamos FUERA, contra ':'Jugamos EN CASA, contra ')+p.rival,'','Fecha: '+fe,'Hora del partido: '+(p.hora||'por confirmar')+(P.cita?'\nHora de citación: '+P.cita:''),'Lugar: '+(P.campo||'por confirmar')+(P.dir?'\nDirección: '+P.dir:'')];
+ if(mp)L.push('Mapa: '+mp);
+ L.push('','Convocados ('+cv.length+'):',...cv.map(j=>'- '+(j.dorsal?j.dorsal+' ':'')+j.nombre));
+ L.push('','Ropa y material:');if(P.equip)L.push('Equipación: '+P.equip);ropa.forEach(r=>L.push('- '+r));
+ if(P.notas)L.push('','Notas: '+P.notas);return L.join('\n')}
+function prepGuardar(pid){const p=S.partidos.find(x=>x.id===pid),f=document.getElementById('fprep');if(!p||!f)return null;const P=prepDe(p);P.cita=f.cita.value;P.campo=f.campo.value;P.dir=f.dir.value;P.mapa=f.mapa.value;P.equip=f.equip.value;P.ropaExtra=f.ropaExtra.value;P.notas=f.notas.value;
+ const v=n=>[...f.querySelectorAll('[name='+n+']')];P.ropa=v('ropa').filter(i=>i.checked).map(i=>i.value);P.convoc={};v('conv').forEach(i=>{if(i.checked)P.convoc[i.value]=1});
+ p.sede=f.sede.value;p.hora=f.hora.value||p.hora;p.fecha=f.fecha.value||p.fecha;save();return p}
+function prepVer(pid){const p=prepGuardar(pid);if(!p)return;const t=document.getElementById('preptxt');t.value=prepTexto(p);document.getElementById('prepcount').textContent=Object.keys(prepDe(p).convoc).length+' convocados'}
+function prepEnviar(pid,via){const p=prepGuardar(pid);if(!p)return;const t=prepTexto(p),asu='Convocatoria: '+(p.sede==='fuera'?'@ ':'vs ')+p.rival+' ('+fmt(p.fecha)+')';document.getElementById('preptxt').value=t;
+ if(via==='wa')window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank');
+ else if(via==='mail')location.href='mailto:?subject='+encodeURIComponent(asu)+'&body='+encodeURIComponent(t);
+ else if(via==='copy'){(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast('Hoja copiada')).catch(()=>{const a=document.getElementById('preptxt');a.select();document.execCommand&&document.execCommand('copy');toast('Hoja copiada')})}
+ else if(via==='share'){if(navigator.share)navigator.share({title:asu,text:t}).catch(()=>{});else toast('Tu navegador no permite compartir: usa WhatsApp, correo o copiar')}}
+function prepPartido(pid){const p=S.partidos.find(x=>x.id===pid);if(!p)return;const P=prepDe(p);
+ openModal(`<div class="mh"><h3>Preparación del partido</h3><button class="icon-btn" aria-label="Cerrar" onclick="closeModal()">×</button></div>
+ <form id="fprep" onsubmit="event.preventDefault();prepGuardar('${pid}');toast('Hoja guardada')">
+ <p class="muted" style="margin-top:0"><b>${esc(p.rival)}</b></p>
+ <div class="row"><div><label>Fecha</label><input type="date" name="fecha" value="${p.fecha}"></div><div><label>Hora del partido</label><input type="time" name="hora" value="${p.hora||''}"></div><div><label>Hora de citación</label><input type="time" name="cita" value="${esc(P.cita)}"></div></div>
+ <div class="row"><div><label>Jugamos</label><select name="sede"><option value="casa" ${p.sede==='casa'?'selected':''}>En casa</option><option value="fuera" ${p.sede==='fuera'?'selected':''}>Fuera</option></select></div><div><label>Nombre del campo</label><input name="campo" value="${esc(P.campo)}" placeholder="Ej.: Campo municipal ..."></div></div>
+ <label>Dirección del campo</label><input name="dir" value="${esc(P.dir)}" placeholder="Calle, número, ciudad">
+ <label>Enlace de mapa (opcional)</label><input name="mapa" value="${esc(P.mapa)}" placeholder="Pega un enlace de Google Maps; si lo dejas vacío se crea uno con la dirección">
+ <label style="margin-top:10px">Convocados</label>
+ <div class="row" style="gap:6px;margin:0 0 6px"><button type="button" class="btn alt sm" onclick="document.querySelectorAll('#fprep [name=conv]').forEach(i=>i.checked=true)">Marcar todos</button><button type="button" class="btn alt sm" onclick="document.querySelectorAll('#fprep [name=conv]').forEach(i=>i.checked=false)">Quitar todos</button></div>
+ <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:4px 10px">${(S.jugadores||[]).slice().sort((a,b)=>(+a.dorsal||99)-(+b.dorsal||99)).map(j=>`<label style="display:flex;gap:8px;align-items:center;font-weight:500;margin:0"><input type="checkbox" name="conv" value="${j.id}" style="width:auto" ${P.convoc&&P.convoc[j.id]?'checked':''}>${j.dorsal?'<b>'+esc(j.dorsal)+'</b>':''} ${esc(j.nombre)}</label>`).join('')||'<span class="muted">Añade jugadores en la pestaña Jugadores.</span>'}</div>
+ <label style="margin-top:10px">Equipación</label><input name="equip" value="${esc(P.equip)}" placeholder="Ej.: camiseta azul, pantalón blanco">
+ <label>Qué deben llevar</label>
+ <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:4px 10px">${ROPA_P.map(r=>`<label style="display:flex;gap:8px;align-items:center;font-weight:500;margin:0"><input type="checkbox" name="ropa" value="${esc(r)}" style="width:auto" ${(P.ropa||[]).includes(r)?'checked':''}>${esc(r)}</label>`).join('')}</div>
+ <label>Otra cosa que llevar</label><input name="ropaExtra" value="${esc(P.ropaExtra)}" placeholder="Ej.: guantes para el portero">
+ <label>Notas para las familias</label><textarea name="notas" rows="2" placeholder="Ej.: llegar 15 minutos antes, avisar si alguien no puede venir">${esc(P.notas)}</textarea>
+ <div class="row" style="margin-top:10px"><button class="btn">Guardar</button><button type="button" class="btn alt" onclick="prepVer('${pid}')">Ver hoja</button></div>
+ <h3 style="margin:14px 0 4px">Enviar la hoja <span class="muted" id="prepcount" style="font-weight:400;font-size:13px"></span></h3>
+ <textarea id="preptxt" rows="9" readonly style="font-size:13px"></textarea>
+ <div class="row" style="margin-top:6px"><button type="button" class="btn" onclick="prepEnviar('${pid}','wa')">WhatsApp</button><button type="button" class="btn alt" onclick="prepEnviar('${pid}','mail')">Correo</button><button type="button" class="btn alt" onclick="prepEnviar('${pid}','share')">Compartir</button><button type="button" class="btn alt" onclick="prepEnviar('${pid}','copy')">Copiar texto</button></div>
+ </form>`);prepVer(pid)}
+{const _pp=R.partidos;R.partidos=function(){_pp();document.querySelectorAll('#app .grid > .card[onclick^="pe="]').forEach(c=>{const m=/pe='([^']+)'/.exec(c.getAttribute('onclick'));if(m&&!c.querySelector('.bprep'))c.insertAdjacentHTML('beforeend',`<button class="btn alt bprep" style="margin-left:6px" onclick="event.stopPropagation();prepPartido('${m[1]}')">Preparar partido</button>`)});
+ const f=document.getElementById('fp');if(f&&pe&&!f.querySelector('.bprep2')){const r=[...f.querySelectorAll('.row')].pop();if(r)r.insertAdjacentHTML('beforeend',`<button type="button" class="btn alt bprep2" onclick="prepPartido('${pe}')">Preparar partido</button>`)}}}
+
+/* ====== COLOCAR LAS 5 SESIONES NUEVAS EN LOS PRÓXIMOS DÍAS LIBRES DEL CALENDARIO ====== */
+const OBJ_CAL5=['Calentamiento: programa FIFA 11+ Kids','Calentamiento: tres bloques con balón','Calentamiento: juegos para benjamín','Preparación física: circuito de coordinación','Preparación física: circuito de velocidad por postas'];
+function recolocarCal5(){const ss=OBJ_CAL5.map(o=>S.sesiones.find(x=>x.obj===o)).filter(Boolean);if(!ss.length)return false;const hoy=todayS();const f=x=>x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');
+ const ocup=new Set(S.sesiones.filter(x=>!ss.includes(x)).map(x=>x.fecha));let d=new Date(hoy+'T12:00:00'),ch=false;
+ ss.forEach(s=>{do{d.setDate(d.getDate()+1)}while(![2,4,5].includes(d.getDay())||ocup.has(f(d)));const n=f(d);ocup.add(n);if(s.fecha!==n){s.fecha=n;ch=true}});return ch}
+
 function addSesEj(){const n=sesEjemplos();sesFisNueva();sesFis3();sesCal5();save();toast(n?n+' sesiones de ejemplo añadidas':'Ya tienes las sesiones de ejemplo');R[tab]&&R[tab]()}
 function quitarSesEj(){S.sesiones=S.sesiones.filter(x=>!x.ejemplo);save();toast('Sesiones de ejemplo quitadas');R[tab]&&R[tab]()}
 
-applyTheme();nav();cargar().then(()=>{S.tareas=S.tareas||[];S.uso=S.uso||[];S.partidos=S.partidos||[];sembrar();if(!S.modeloBenj){modeloBenjamin();save()}if(S.ejemplosWeb!==4){const _n=ejemplosWeb();if(_n)save()}if(S.tacEj!==2&&addTacEj())save();if(S.sesEj!==2&&sesEjemplos())save();if(!S.sesFis&&sesFisNueva())save();if(!S.sesFis3&&sesFis3())save();if(!S.sesCal5&&sesCal5())save();if(S.ejOrd!==1){S.ejOrd=1;ordenarEj();save()}if(!S.plantImp){S.plantImp=1;try{importarPlantilla()}catch(e){}}nav();R.inicio()});
+applyTheme();nav();cargar().then(()=>{S.tareas=S.tareas||[];S.uso=S.uso||[];S.partidos=S.partidos||[];sembrar();if(!S.modeloBenj){modeloBenjamin();save()}if(S.ejemplosWeb!==4){const _n=ejemplosWeb();if(_n)save()}if(S.tacEj!==2&&addTacEj())save();if(S.sesEj!==2&&sesEjemplos())save();if(!S.sesFis&&sesFisNueva())save();if(!S.sesFis3&&sesFis3())save();if(S.ejOrd!==1){S.ejOrd=1;ordenarEj();save()}if(!S.sesCal5&&sesCal5())save();if(S.cal5F!==1){S.cal5F=1;recolocarCal5();save()}if(!S.plantImp){S.plantImp=1;try{importarPlantilla()}catch(e){}}nav();R.inicio()});
 
 /*SW_START*/if('serviceWorker' in navigator&&location.protocol.startsWith('http')){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}/*SW_END*/
 

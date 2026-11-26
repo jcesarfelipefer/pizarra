@@ -1914,5 +1914,9 @@ function partidoSemana(){const L=(S.partidos||[]).slice().sort((a,b)=>(a.fecha+(
 
 /* ====== SESIONES: cabecera campo verde ====== */
 {const _rs=R.sesiones;R.sesiones=function(){_rs.apply(this,arguments);const b=document.getElementById('btnNuevaSes');const h=b&&b.parentElement;if(h&&!h.classList.contains('hero')){h.classList.add('hero');h.style.margin='0 0 14px';h.style.padding='20px'}}}
+
+/* ====== CALENDARIO y PARTIDOS: cabecera campo verde ====== */
+{const _rc=R.calendario;R.calendario=function(){_rc.apply(this,arguments);const b=document.getElementById('btnNuevaSesCal');const h=b&&b.parentElement;if(h&&!h.classList.contains('hero')){h.classList.add('hero');h.style.margin='0 0 14px';h.style.padding='20px'}}}
+{const _rp=R.partidos;R.partidos=function(){_rp.apply(this,arguments);const h=document.querySelector('#app>h2');if(h&&!h.parentElement.classList.contains('hero')&&/Partidos/.test(h.textContent)){const d=document.createElement('div');d.className='hero';d.style.cssText='margin:0 0 14px;padding:20px';h.before(d);d.appendChild(h);h.style.margin='0'}}}
 </script>
 </body></html>

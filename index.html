@@ -1169,29 +1169,82 @@ function sesCal5(){S.sesiones=S.sesiones||[];S.tareas=S.tareas||[];const hoy=tod
 const ROPA_P=['Camiseta de juego','Pantalón','Medias','Botas','Espinilleras','Botella de agua','Chubasquero o abrigo','Ropa de cambio y chancletas'];
 function prepDe(p){if(!p.prep){const c={};(S.jugadores||[]).forEach(j=>c[j.id]=1);p.prep={cita:'',campo:'',dir:'',mapa:'',ropa:ROPA_P.slice(0,6),ropaExtra:'',equip:'Equipación oficial del club',convoc:c,notas:''}}return p.prep}
 function mapaUrl(P){if(P.mapa&&/^https?:\/\//i.test(P.mapa.trim()))return P.mapa.trim();const q=[P.campo,P.dir].filter(Boolean).join(', ');return q?'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q):''}
+function citaAuto(p){const m=/^(\d{1,2}):(\d{2})$/.exec(p.hora||'');if(!m)return '';let t=(+m[1])*60+(+m[2])-45;if(t<0)t+=1440;return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0')}
+function citaDe(p){const P=prepDe(p);return P.citaMan&&P.cita?P.cita:citaAuto(p)}
 function prepTexto(p){const P=prepDe(p),eq=(S.equipo||'Racing Villaverde'),dias=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'],d=new Date(p.fecha+'T12:00:00');
  const fe=dias[d.getDay()]+' '+d.getDate()+' de '+d.toLocaleDateString('es-ES',{month:'long'});
  const cv=(S.jugadores||[]).filter(j=>P.convoc&&P.convoc[j.id]).sort((a,b)=>(+a.dorsal||99)-(+b.dorsal||99));
  const mp=mapaUrl(P),ropa=[...(P.ropa||[]),...(P.ropaExtra?[P.ropaExtra]:[])];
- const L=['CONVOCATORIA - '+eq+' Benjamín',(p.comp?p.comp+'\n':'')+(p.sede==='fuera'?'Jugamos FUERA, contra ':'Jugamos EN CASA, contra ')+p.rival,'','Fecha: '+fe,'Hora del partido: '+(p.hora||'por confirmar')+(P.cita?'\nHora de citación: '+P.cita:''),'Lugar: '+(P.campo||'por confirmar')+(P.dir?'\nDirección: '+P.dir:'')];
+ const L=['CONVOCATORIA - '+eq+' Benjamín',(p.comp?p.comp+'\n':'')+(p.sede==='fuera'?'Jugamos FUERA, contra ':'Jugamos EN CASA, contra ')+p.rival,'','Fecha: '+fe,'Hora del partido: '+(p.hora||'por confirmar')+(citaDe(p)?'\nHora de citación (45 min antes): '+citaDe(p):''),'Lugar: '+(P.campo||'por confirmar')+(P.dir?'\nDirección: '+P.dir:'')];
  if(mp)L.push('Mapa: '+mp);
  L.push('','Convocados ('+cv.length+'):',...cv.map(j=>'- '+(j.dorsal?j.dorsal+' ':'')+j.nombre));
  L.push('','Ropa y material:');if(P.equip)L.push('Equipación: '+P.equip);ropa.forEach(r=>L.push('- '+r));
  if(P.notas)L.push('','Notas: '+P.notas);return L.join('\n')}
-function prepGuardar(pid){const p=S.partidos.find(x=>x.id===pid),f=document.getElementById('fprep');if(!p||!f)return null;const P=prepDe(p);P.cita=f.cita.value;P.campo=f.campo.value;P.dir=f.dir.value;P.mapa=f.mapa.value;P.equip=f.equip.value;P.ropaExtra=f.ropaExtra.value;P.notas=f.notas.value;
+function prepGuardar(pid){const p=S.partidos.find(x=>x.id===pid),f=document.getElementById('fprep');if(!p||!f)return null;const P=prepDe(p);P.campo=f.campo.value;P.dir=f.dir.value;P.mapa=f.mapa.value;P.equip=f.equip.value;P.ropaExtra=f.ropaExtra.value;P.notas=f.notas.value;
  const v=n=>[...f.querySelectorAll('[name='+n+']')];P.ropa=v('ropa').filter(i=>i.checked).map(i=>i.value);P.convoc={};v('conv').forEach(i=>{if(i.checked)P.convoc[i.value]=1});
- p.sede=f.sede.value;p.hora=f.hora.value||p.hora;p.fecha=f.fecha.value||p.fecha;save();return p}
+ p.sede=f.sede.value;p.hora=f.hora.value||p.hora;p.fecha=f.fecha.value||p.fecha;P.cita=f.cita.value;P.citaMan=(f.cita.value&&f.cita.value!==citaAuto(p))?1:0;save();return p}
 function prepVer(pid){const p=prepGuardar(pid);if(!p)return;const t=document.getElementById('preptxt');t.value=prepTexto(p);document.getElementById('prepcount').textContent=Object.keys(prepDe(p).convoc).length+' convocados'}
 function prepEnviar(pid,via){const p=prepGuardar(pid);if(!p)return;const t=prepTexto(p),asu='Convocatoria: '+(p.sede==='fuera'?'@ ':'vs ')+p.rival+' ('+fmt(p.fecha)+')';document.getElementById('preptxt').value=t;
  if(via==='wa')window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank');
  else if(via==='mail')location.href='mailto:?subject='+encodeURIComponent(asu)+'&body='+encodeURIComponent(t);
  else if(via==='copy'){(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast('Hoja copiada')).catch(()=>{const a=document.getElementById('preptxt');a.select();document.execCommand&&document.execCommand('copy');toast('Hoja copiada')})}
  else if(via==='share'){if(navigator.share)navigator.share({title:asu,text:t}).catch(()=>{});else toast('Tu navegador no permite compartir: usa WhatsApp, correo o copiar')}}
+
+/* ====== HOJA DE CONVOCATORIA EN IMAGEN ====== */
+function prepCanvas(p){const P=prepDe(p),eq=(S.equipo||'Racing Villaverde'),W=1080,dias=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'],d=new Date(p.fecha+'T12:00:00');
+ const fe=dias[d.getDay()]+' '+d.getDate()+' de '+d.toLocaleDateString('es-ES',{month:'long'})+' de '+d.getFullYear();
+ const cv=(S.jugadores||[]).filter(j=>P.convoc&&P.convoc[j.id]).sort((a,b)=>(+a.dorsal||99)-(+b.dorsal||99));
+ const ropa=[...(P.ropa||[]),...(P.ropaExtra?[P.ropaExtra]:[])],cita=citaDe(p),F='-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif';
+ const c=document.createElement('canvas');c.width=W;const rows=Math.ceil(cv.length/2),rr=Math.ceil(ropa.length/2);
+ const notasL=[];const m0=c.getContext('2d');m0.font='28px '+F;
+ const wrap=(t,mw)=>{const out=[];String(t||'').split('\n').forEach(par=>{let l='';par.split(' ').forEach(w=>{const t2=l?l+' '+w:w;if(m0.measureText(t2).width>mw&&l){out.push(l);l=w}else l=t2});out.push(l)});return out};
+ const dirL=wrap([P.campo,P.dir].filter(Boolean).join(' · '),W-150);
+ const nL=P.notas?wrap(P.notas,W-150):[];
+ const H=330+210+dirL.length*38+60+(cv.length?90+rows*56:0)+(ropa.length?90+rr*52:0)+(P.equip?80:0)+(nL.length?90+nL.length*38:0)+150;
+ c.height=4000;const x=c.getContext('2d');
+ x.fillStyle='#f3f6fb';x.fillRect(0,0,W,4000);
+ const g=x.createLinearGradient(0,0,W,320);g.addColorStop(0,'#0b1f44');g.addColorStop(1,'#1f4e8c');x.fillStyle=g;x.fillRect(0,0,W,320);
+ x.fillStyle='rgba(255,255,255,.07)';x.beginPath();x.arc(W-60,40,200,0,7);x.fill();
+ x.fillStyle='#9ec5ff';x.font='bold 26px '+F;x.fillText('CONVOCATORIA DE PARTIDO',60,82);
+ x.fillStyle='#fff';x.font='bold 52px '+F;x.fillText(eq,60,152);
+ x.font='30px '+F;x.fillStyle='#dbe8ff';x.fillText((p.comp||'Partido').slice(0,60),60,200);
+ x.fillStyle='#fff';x.font='bold 40px '+F;let rv='vs '+p.rival;while(x.measureText(rv).width>W-120&&rv.length>8)rv=rv.slice(0,-2);x.fillText(rv,60,262);
+ const sede=p.sede==='fuera'?'FUERA':'EN CASA';x.font='bold 24px '+F;const sw=x.measureText(sede).width+44;x.fillStyle=p.sede==='fuera'?'#e8a317':'#2e9d57';rd(x,W-60-sw,40,sw,48,24);x.fill();x.fillStyle='#fff';x.fillText(sede,W-60-sw+22,73);
+ function rd(c2,X,Y,w,h,r){c2.beginPath();c2.moveTo(X+r,Y);c2.arcTo(X+w,Y,X+w,Y+h,r);c2.arcTo(X+w,Y+h,X,Y+h,r);c2.arcTo(X,Y+h,X,Y,r);c2.arcTo(X,Y,X+w,Y,r);c2.closePath()}
+ let y=300;
+ // tarjetas de hora
+ const card=(X,w,lab,val,col)=>{x.fillStyle='#fff';x.shadowColor='rgba(11,31,68,.18)';x.shadowBlur=18;x.shadowOffsetY=6;rd(x,X,y,w,150,22);x.fill();x.shadowColor='transparent';x.fillStyle=col;rd(x,X,y,10,150,5);x.fill();x.fillStyle='#5b6b86';x.font='bold 22px '+F;x.fillText(lab,X+34,y+44);x.fillStyle='#0b1f44';x.font='bold 46px '+F;wrapTxt(x,val,X+34,y+104,w-60,46)};
+ function wrapTxt(c2,t,X,Y,mw,fs){let f=fs;c2.font='bold '+f+'px '+F;while(c2.measureText(t).width>mw&&f>20){f-=2;c2.font='bold '+f+'px '+F}c2.fillText(t,X,Y)}
+ card(60,640,'FECHA',fe,'#1f4e8c');card(720,300,'HORA PARTIDO',p.hora||'--:--','#1f4e8c');
+ y+=170;
+ x.fillStyle='#fff';x.shadowColor='rgba(11,31,68,.18)';x.shadowBlur=18;x.shadowOffsetY=6;rd(x,60,y,960,130,22);x.fill();x.shadowColor='transparent';
+ x.fillStyle='#d9381e';rd(x,60,y,10,130,5);x.fill();x.fillStyle='#5b6b86';x.font='bold 22px '+F;x.fillText('HORA DE CITACIÓN (45 MIN ANTES)',94,y+42);
+ x.fillStyle='#d9381e';x.font='bold 64px '+F;x.fillText(cita||'--:--',94,y+106);x.fillStyle='#5b6b86';x.font='24px '+F;x.fillText('Llegar puntuales al campo',330,y+100);
+ y+=160+30;
+ x.fillStyle='#1f4e8c';x.font='bold 24px '+F;x.fillText('LUGAR',60,y);y+=18;
+ x.fillStyle='#fff';const bh=dirL.length*38+30;rd(x,60,y,960,bh,18);x.fill();x.fillStyle='#0b1f44';x.font='28px '+F;dirL.forEach((l,i)=>x.fillText(l,84,y+44+i*38));y+=bh+50;
+ const sect=t=>{x.fillStyle='#1f4e8c';x.font='bold 24px '+F;x.fillText(t,60,y);x.fillRect(60,y+10,60,4);y+=52};
+ if(cv.length){sect('CONVOCADOS ('+cv.length+')');cv.forEach((j,i)=>{const col=i%2,row=Math.floor(i/2),X=60+col*490,Y=y+row*56;x.fillStyle='#fff';rd(x,X,Y,470,46,23);x.fill();x.fillStyle='#1f4e8c';x.beginPath();x.arc(X+23,Y+23,19,0,7);x.fill();x.fillStyle='#fff';x.font='bold 20px '+F;x.textAlign='center';x.fillText(j.dorsal||'-',X+23,Y+30);x.textAlign='left';x.fillStyle='#0b1f44';x.font='26px '+F;let nm=j.nombre;while(x.measureText(nm).width>400&&nm.length>4)nm=nm.slice(0,-2);x.fillText(nm,X+56,Y+32)});y+=rows*56+40}
+ if(P.equip){sect('EQUIPACIÓN');x.fillStyle='#0b1f44';x.font='28px '+F;x.fillText(P.equip,60,y);y+=50}
+ if(ropa.length){sect('QUÉ DEBEN LLEVAR');ropa.forEach((r,i)=>{const col=i%2,row=Math.floor(i/2),X=60+col*490,Y=y+row*52;x.fillStyle='#2e9d57';rd(x,X,Y+4,30,30,8);x.fill();x.strokeStyle='#fff';x.lineWidth=4;x.beginPath();x.moveTo(X+7,Y+20);x.lineTo(X+13,Y+27);x.lineTo(X+24,Y+12);x.stroke();x.fillStyle='#0b1f44';x.font='26px '+F;let t=r;while(x.measureText(t).width>420&&t.length>4)t=t.slice(0,-2);x.fillText(t,X+44,Y+30)});y+=rr*52+40}
+ if(nL.length){sect('NOTAS PARA LAS FAMILIAS');x.fillStyle='#0b1f44';x.font='28px '+F;nL.forEach((l,i)=>x.fillText(l,60,y+i*38));y+=nL.length*38+20}
+ const HF=y+60,o=document.createElement('canvas');o.width=W;o.height=HF;const z=o.getContext('2d');z.drawImage(c,0,0);z.fillStyle='#0b1f44';z.fillRect(0,HF-70,W,70);z.fillStyle='#9ec5ff';z.font='22px '+F;z.fillText(eq+' · Preparado con Pizarra',60,HF-27);
+ return o}
+function prepCaption(p){const P=prepDe(p),mp=mapaUrl(P),dias=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'],d=new Date(p.fecha+'T12:00:00');return 'Convocatoria '+(p.sede==='fuera'?'@ ':'vs ')+p.rival+' · '+dias[d.getDay()]+' '+d.getDate()+'/'+(d.getMonth()+1)+' · Partido '+(p.hora||'')+' · Citación '+citaDe(p)+(mp?'\nMapa: '+mp:'')}
+function prepImgVer(pid){const p=prepGuardar(pid);if(!p)return;const c=prepCanvas(p),im=document.getElementById('prepimg');if(im){im.src=c.toDataURL('image/png')}document.getElementById('preptxt').value=prepTexto(p)}
+function prepImgBlob(p){return new Promise(r=>prepCanvas(p).toBlob(r,'image/png'))}
+function prepImgNombre(p){return 'convocatoria-'+p.fecha+'-'+String(p.rival).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')+'.png'}
+async function prepImgEnviar(pid,via){const p=prepGuardar(pid);if(!p)return;const b=await prepImgBlob(p),nom=prepImgNombre(p),cap=prepCaption(p);
+ if(via!=='dl'){const f=new File([b],nom,{type:'image/png'});if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:'Convocatoria',text:cap});return}catch(e){if(e&&e.name==='AbortError')return}}}
+ const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=nom;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500);
+ if(via==='wa'){toast('Imagen descargada. Adjúntala en WhatsApp');window.open('https://wa.me/?text='+encodeURIComponent(cap),'_blank')}
+ else if(via==='mail'){toast('Imagen descargada. Adjúntala en el correo');location.href='mailto:?subject='+encodeURIComponent('Convocatoria '+(p.sede==='fuera'?'@ ':'vs ')+p.rival+' ('+fmt(p.fecha)+')')+'&body='+encodeURIComponent(cap+'\n\n(Adjunta la imagen descargada)')}
+ else toast('Imagen descargada')}
 function prepPartido(pid){const p=S.partidos.find(x=>x.id===pid);if(!p)return;const P=prepDe(p);
  openModal(`<div class="mh"><h3>Preparación del partido</h3><button class="icon-btn" aria-label="Cerrar" onclick="closeModal()">×</button></div>
  <form id="fprep" onsubmit="event.preventDefault();prepGuardar('${pid}');toast('Hoja guardada')">
  <p class="muted" style="margin-top:0"><b>${esc(p.rival)}</b></p>
- <div class="row"><div><label>Fecha</label><input type="date" name="fecha" value="${p.fecha}"></div><div><label>Hora del partido</label><input type="time" name="hora" value="${p.hora||''}"></div><div><label>Hora de citación</label><input type="time" name="cita" value="${esc(P.cita)}"></div></div>
+ <div class="row"><div><label>Fecha</label><input type="date" name="fecha" value="${p.fecha}"></div><div><label>Hora del partido</label><input type="time" name="hora" value="${p.hora||''}"></div><div><label>Citación (45 min antes)</label><input type="time" name="cita" value="${esc(citaDe(p))}"></div></div>
  <div class="row"><div><label>Jugamos</label><select name="sede"><option value="casa" ${p.sede==='casa'?'selected':''}>En casa</option><option value="fuera" ${p.sede==='fuera'?'selected':''}>Fuera</option></select></div><div><label>Nombre del campo</label><input name="campo" value="${esc(P.campo)}" placeholder="Ej.: Campo municipal ..."></div></div>
  <label>Dirección del campo</label><input name="dir" value="${esc(P.dir)}" placeholder="Calle, número, ciudad">
  <label>Enlace de mapa (opcional)</label><input name="mapa" value="${esc(P.mapa)}" placeholder="Pega un enlace de Google Maps; si lo dejas vacío se crea uno con la dirección">
@@ -1204,10 +1257,13 @@ function prepPartido(pid){const p=S.partidos.find(x=>x.id===pid);if(!p)return;co
  <label>Otra cosa que llevar</label><input name="ropaExtra" value="${esc(P.ropaExtra)}" placeholder="Ej.: guantes para el portero">
  <label>Notas para las familias</label><textarea name="notas" rows="2" placeholder="Ej.: llegar 15 minutos antes, avisar si alguien no puede venir">${esc(P.notas)}</textarea>
  <div class="row" style="margin-top:10px"><button class="btn">Guardar</button><button type="button" class="btn alt" onclick="prepVer('${pid}')">Ver hoja</button></div>
- <h3 style="margin:14px 0 4px">Enviar la hoja <span class="muted" id="prepcount" style="font-weight:400;font-size:13px"></span></h3>
+ <h3 style="margin:14px 0 4px">Hoja lista para enviar <span class="muted" id="prepcount" style="font-weight:400;font-size:13px"></span></h3>
+ <img id="prepimg" alt="Vista previa de la hoja" style="width:100%;max-width:420px;border-radius:12px;border:1px solid var(--line,#d5dce8);display:block;margin:6px auto">
+ <div class="row" style="margin-top:6px"><button type="button" class="btn" onclick="prepImgEnviar('${pid}','wa')">Enviar imagen</button><button type="button" class="btn alt" onclick="prepImgEnviar('${pid}','mail')">Por correo</button><button type="button" class="btn alt" onclick="prepImgEnviar('${pid}','dl')">Descargar imagen</button><button type="button" class="btn alt" onclick="prepVer('${pid}');prepImgVer('${pid}')">Actualizar vista</button></div>
+ <h3 style="margin:14px 0 4px">Versión en texto</h3>
  <textarea id="preptxt" rows="9" readonly style="font-size:13px"></textarea>
  <div class="row" style="margin-top:6px"><button type="button" class="btn" onclick="prepEnviar('${pid}','wa')">WhatsApp</button><button type="button" class="btn alt" onclick="prepEnviar('${pid}','mail')">Correo</button><button type="button" class="btn alt" onclick="prepEnviar('${pid}','share')">Compartir</button><button type="button" class="btn alt" onclick="prepEnviar('${pid}','copy')">Copiar texto</button></div>
- </form>`);prepVer(pid)}
+ </form>`);prepVer(pid);prepImgVer(pid)}
 {const _pp=R.partidos;R.partidos=function(){_pp();document.querySelectorAll('#app .grid > .card[onclick^="pe="]').forEach(c=>{const m=/pe='([^']+)'/.exec(c.getAttribute('onclick'));if(m&&!c.querySelector('.bprep'))c.insertAdjacentHTML('beforeend',`<button class="btn alt bprep" style="margin-left:6px" onclick="event.stopPropagation();prepPartido('${m[1]}')">Preparar partido</button>`)});
  const f=document.getElementById('fp');if(f&&pe&&!f.querySelector('.bprep2')){const r=[...f.querySelectorAll('.row')].pop();if(r)r.insertAdjacentHTML('beforeend',`<button type="button" class="btn alt bprep2" onclick="prepPartido('${pe}')">Preparar partido</button>`)}}}
 
@@ -1218,10 +1274,18 @@ function recolocarCal5(){const ss=OBJ_CAL5.map(o=>S.sesiones.find(x=>x.obj===o))
  ss.forEach(s=>{do{d.setDate(d.getDate()+1)}while(![2,4,5].includes(d.getDay())||ocup.has(f(d)));const n=f(d);ocup.add(n);if(s.fecha!==n){s.fecha=n;ch=true}});return ch}
 
 function addProxPartido(){S.partidos=S.partidos||[];if(S.partidos.some(x=>x.fecha==='2026-11-28'&&/orcasur/i.test(x.rival)))return false;const p={id:id(),fecha:'2026-11-28',hora:'11:00',rival:'C.D. Orcasur Sin Fronteras',sede:'casa',comp:'Preferente Benjamín F-7 · Grupo 13 · Jornada 7',dur:50,mins:{},tit:{},gf:'',gc:''};S.partidos.push(p);const P=prepDe(p);P.cita='10:15';P.campo='Campo de fútbol Asoc. Vec. Orcasitas (H.A.)';P.dir='Camino Viejo de Villaverde s/n, 28041 Madrid';P.notas='Llegar a la hora de citación y avisar si alguien no puede venir.';return true}
+
+/* ====== CALENDARIO DE LIGA: Racing Villaverde C.F. "B" · Preferente Benjamín F-7 · Grupo 13 ====== */
+const LIGA_RV=[[2,'2026-10-17','10:00','C.D. Alzola-Halcones "C"','fuera',0,1],[3,'2026-10-24','09:00','Esc. Fut. A.V. La Chimenea','casa',0,1],[4,'2026-11-07','11:00','CDE Academia Fenix - Vallecas','fuera',0,1],[5,'2026-11-14','09:00','A.D. Villaverde Bajo "B"','casa',0,1],[6,'2026-11-21','11:00','A.D. Orcasitas','fuera',0,1],[7,'2026-11-28','11:00','C.D. Orcasur Sin Fronteras','casa'],[8,'2026-12-12','10:00','Union Deportiva Usera','fuera'],[9,'2026-12-19','09:00','A.D. Escuela de Futbol Usera','casa'],[10,'2027-01-16','10:00','A.D.C. San Fermin "B"','fuera'],[11,'2027-01-23','10:00','S.A.D. Fundacion Rayo Vallecano "G"','casa'],[12,'2027-01-30','09:00','Vallecas C.F. "B"','casa'],[13,'2027-02-06','10:00','C.D. Alzola-Halcones "B"','fuera']];
+function addLigaRV(){S.partidos=S.partidos||[];let n=0;LIGA_RV.forEach(([j,f,h,r,sd,gf,gc])=>{let p=S.partidos.find(x=>x.fecha===f&&!x.demo);const comp='Preferente Benjamín F-7 · Grupo 13 · Jornada '+j;if(!p){p={id:id(),fecha:f,hora:h,rival:r,sede:sd,comp,dur:50,mins:{},tit:{},gf:'',gc:''};S.partidos.push(p);n++}
+ else{p.hora=h;p.comp=comp;if(!p.sede)p.sede=sd}
+ if(gf!==undefined&&(p.gf===''||p.gf==null)){p.gf=gf;p.gc=gc}
+ const P=prepDe(p);if(!P.campo){P.campo='Campo de fútbol Asoc. Vec. Orcasitas (H.A.)';P.dir='Camino Viejo de Villaverde s/n, 28041 Madrid'}});
+ return n}
 function addSesEj(){const n=sesEjemplos();sesFisNueva();sesFis3();sesCal5();save();toast(n?n+' sesiones de ejemplo añadidas':'Ya tienes las sesiones de ejemplo');R[tab]&&R[tab]()}
 function quitarSesEj(){S.sesiones=S.sesiones.filter(x=>!x.ejemplo);save();toast('Sesiones de ejemplo quitadas');R[tab]&&R[tab]()}
 
-applyTheme();nav();cargar().then(()=>{S.tareas=S.tareas||[];S.uso=S.uso||[];S.partidos=S.partidos||[];sembrar();if(!S.modeloBenj){modeloBenjamin();save()}if(S.ejemplosWeb!==4){const _n=ejemplosWeb();if(_n)save()}if(S.tacEj!==2&&addTacEj())save();if(S.sesEj!==2&&sesEjemplos())save();if(!S.sesFis&&sesFisNueva())save();if(!S.sesFis3&&sesFis3())save();if(S.ejOrd!==1){S.ejOrd=1;ordenarEj();save()}if(!S.sesCal5&&sesCal5())save();if(S.cal5F!==1){S.cal5F=1;recolocarCal5();save()}if(!S.plantImp){S.plantImp=1;try{importarPlantilla()}catch(e){}}if(!S.pp28){S.pp28=1;if(addProxPartido())save()}nav();R.inicio()});
+applyTheme();nav();cargar().then(()=>{S.tareas=S.tareas||[];S.uso=S.uso||[];S.partidos=S.partidos||[];sembrar();if(!S.modeloBenj){modeloBenjamin();save()}if(S.ejemplosWeb!==4){const _n=ejemplosWeb();if(_n)save()}if(S.tacEj!==2&&addTacEj())save();if(S.sesEj!==2&&sesEjemplos())save();if(!S.sesFis&&sesFisNueva())save();if(!S.sesFis3&&sesFis3())save();if(S.ejOrd!==1){S.ejOrd=1;ordenarEj();save()}if(!S.sesCal5&&sesCal5())save();if(S.cal5F!==1){S.cal5F=1;recolocarCal5();save()}if(!S.plantImp){S.plantImp=1;try{importarPlantilla()}catch(e){}}if(!S.pp28){S.pp28=1;if(addProxPartido())save()}if(S.ligaRV!==1){S.ligaRV=1;addLigaRV();save()}nav();R.inicio()});
 
 /*SW_START*/if('serviceWorker' in navigator&&location.protocol.startsWith('http')){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}/*SW_END*/
 

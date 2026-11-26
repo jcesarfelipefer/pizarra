@@ -175,6 +175,13 @@ table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;p
 #app .hero h2,#app .hero p{text-shadow:0 1px 3px rgba(0,0,0,.35)}
 #app .hero .btn.alt{background:rgba(0,0,0,.28);border-color:rgba(255,255,255,.5)}
 @media(max-width:700px){#app .hero:not(.hero2)::after{opacity:.5;left:auto;right:20px;margin:-45px 0 0 0}}
+/* ====== cabeceras: legibilidad ====== */
+#app .hero{background:linear-gradient(rgba(0,20,5,.30),rgba(0,20,5,.30)),url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 600 400%22 preserveAspectRatio=%22none%22%3E%3Crect width=%22600%22 height=%22400%22 fill=%22%232f8f46%22/%3E%3Crect x=%220%22 width=%2250%22 height=%22400%22 fill=%22%23000%22 opacity=%22.05%22/%3E%3Crect x=%22100%22 width=%2250%22 height=%22400%22 fill=%22%23000%22 opacity=%22.05%22/%3E%3Crect x=%22200%22 width=%2250%22 height=%22400%22 fill=%22%23000%22 opacity=%22.05%22/%3E%3Crect x=%22300%22 width=%2250%22 height=%22400%22 fill=%22%23000%22 opacity=%22.05%22/%3E%3Crect x=%22400%22 width=%2250%22 height=%22400%22 fill=%22%23000%22 opacity=%22.05%22/%3E%3Crect x=%22500%22 width=%2250%22 height=%22400%22 fill=%22%23000%22 opacity=%22.05%22/%3E%3Cg fill=%22none%22 stroke=%22%23fff%22 stroke-width=%222%22 opacity=%22.4%22 vector-effect=%22non-scaling-stroke%22%3E%3Crect x=%2210%22 y=%2210%22 width=%22580%22 height=%22380%22 vector-effect=%22non-scaling-stroke%22/%3E%3Cpath d=%22M300 10v380%22 vector-effect=%22non-scaling-stroke%22/%3E%3Crect x=%2210%22 y=%22110%22 width=%2280%22 height=%22180%22 vector-effect=%22non-scaling-stroke%22/%3E%3Crect x=%22510%22 y=%22110%22 width=%2280%22 height=%22180%22 vector-effect=%22non-scaling-stroke%22/%3E%3Crect x=%2210%22 y=%22165%22 width=%2225%22 height=%2270%22 vector-effect=%22non-scaling-stroke%22/%3E%3Crect x=%22565%22 y=%22165%22 width=%2225%22 height=%2270%22 vector-effect=%22non-scaling-stroke%22/%3E%3C/g%3E%3C/svg%3E") center/100% 100% no-repeat!important}
+#app .hero h2{font-weight:800;text-shadow:0 2px 6px rgba(0,0,0,.7),0 0 2px rgba(0,0,0,.6)}
+#app .hero p,#app .hero h3,#app .hero .muted{color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.7)}
+#app .hero.hdr{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;border-bottom:0}
+#app .hero.hdr h2{margin:0;border:0}
+#app .hero.hdr::after{display:none}
 </style>
 </head>
 <body>
@@ -1918,5 +1925,12 @@ function partidoSemana(){const L=(S.partidos||[]).slice().sort((a,b)=>(a.fecha+(
 /* ====== CALENDARIO y PARTIDOS: cabecera campo verde ====== */
 {const _rc=R.calendario;R.calendario=function(){_rc.apply(this,arguments);const b=document.getElementById('btnNuevaSesCal');const h=b&&b.parentElement;if(h&&!h.classList.contains('hero')){h.classList.add('hero');h.style.margin='0 0 14px';h.style.padding='20px'}}}
 {const _rp=R.partidos;R.partidos=function(){_rp.apply(this,arguments);const h=document.querySelector('#app>h2');if(h&&!h.parentElement.classList.contains('hero')&&/Partidos/.test(h.textContent)){const d=document.createElement('div');d.className='hero';d.style.cssText='margin:0 0 14px;padding:20px';h.before(d);d.appendChild(h);h.style.margin='0'}}}
+
+/* ====== TODAS las cabeceras con campo + calendario en mes ====== */
+function decoCab(){const h=document.querySelector('#app h2');if(!h||h.closest('.hero,.card,.modal'))return;const p=h.parentElement;if(!p)return;
+ if(p.id==='app'||p.tagName==='MAIN'){const d=document.createElement('div');d.className='hero hdr';d.style.cssText='margin:0 0 14px;padding:20px';h.before(d);d.appendChild(h);}
+ else if(p.classList.contains('sec')||p.querySelector(':scope>button')){p.classList.add('hero','hdr');p.style.cssText+=';margin:0 0 14px;padding:20px'}}
+Object.keys(R).forEach(k=>{const _o=R[k];R[k]=function(){const r=_o.apply(this,arguments);try{decoCab()}catch(e){}return r}});
+{const _go=go;go=function(t){if(t==='calendario')cal.view='mes';return _go.apply(this,arguments)}}
 </script>
 </body></html>

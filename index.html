@@ -217,6 +217,9 @@ details.hcat[open]>summary::after{transform:rotate(180deg)}
 details.hcat .dot{width:12px;height:12px;border-radius:50%}
 details.hcat .cnt{font-weight:600;color:var(--muted);font-size:13px}
 details.hcat .hgrid{padding:0 14px 14px}
+/* kpis sin huecos */
+.kpis{grid-template-columns:repeat(3,1fr)!important}
+@media(max-width:700px){.kpis{grid-template-columns:repeat(2,1fr)!important}}
 </style>
 </head>
 <body>

@@ -1327,7 +1327,7 @@ function addLigaRV(){S.partidos=S.partidos||[];let n=0;LIGA_RV.forEach(([j,f,h,r
 function addSesEj(){const n=sesEjemplos();sesFisNueva();sesFis3();sesCal5();save();toast(n?n+' sesiones de ejemplo añadidas':'Ya tienes las sesiones de ejemplo');R[tab]&&R[tab]()}
 function quitarSesEj(){S.sesiones=S.sesiones.filter(x=>!x.ejemplo);save();toast('Sesiones de ejemplo quitadas');R[tab]&&R[tab]()}
 
-applyTheme();nav();cargar().then(()=>{S.tareas=S.tareas||[];S.uso=S.uso||[];S.partidos=S.partidos||[];minimizarJug();sembrar();if(!S.modeloBenj){modeloBenjamin();save()}if(S.ejemplosWeb!==4){const _n=ejemplosWeb();if(_n)save()}if((S.tacEj||0)<3&&addTacEj())save();if(S.sesEj!==2&&sesEjemplos())save();if(!S.sesFis&&sesFisNueva())save();if(!S.sesFis3&&sesFis3())save();if(S.ejOrd!==1){S.ejOrd=1;ordenarEj();save()}if(!S.sesCal5&&sesCal5())save();if(S.cal5F!==1){S.cal5F=1;recolocarCal5();save()}if(!S.plantImp){S.plantImp=1;try{importarPlantilla()}catch(e){}}if(!S.pp28){S.pp28=1;if(addProxPartido())save()}if(S.ligaRV!==1){S.ligaRV=1;addLigaRV();save()}nav();R.inicio()});
+applyTheme();nav();cargar().then(()=>{S.tareas=S.tareas||[];S.uso=S.uso||[];S.partidos=S.partidos||[];minimizarJug();sembrar();if(!S.modeloBenj){modeloBenjamin();save()}if(S.ejemplosWeb!==4){const _n=ejemplosWeb();if(_n)save()}if((S.tacEj||0)<4&&addTacEj())save();if(S.sesEj!==2&&sesEjemplos())save();if(!S.sesFis&&sesFisNueva())save();if(!S.sesFis3&&sesFis3())save();if(S.ejOrd!==1){S.ejOrd=1;ordenarEj();save()}if(!S.sesCal5&&sesCal5())save();if(S.cal5F!==1){S.cal5F=1;recolocarCal5();save()}if(!S.plantImp){S.plantImp=1;try{importarPlantilla()}catch(e){}}if(!S.pp28){S.pp28=1;if(addProxPartido())save()}if(S.ligaRV!==1){S.ligaRV=1;addLigaRV();save()}nav();R.inicio()});
 
 /*SW_START*/if('serviceWorker' in navigator&&location.protocol.startsWith('http')){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}/*SW_END*/
 
@@ -1404,7 +1404,7 @@ function tacEl(e,i,sel){const s=sel?'stroke="#fde047" stroke-width="3"':'';
  return''}
 function tacSvg(els,sel,id_){return`<svg ${id_?`id="${id_}"`:''} viewBox="0 0 600 400" style="width:100%;height:auto;display:block;border-radius:12px;touch-action:none;background:#2f8f46"><defs><marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0L8 4L0 8z" fill="#fff"/></marker><marker id="ahs" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0L8 4L0 8z" fill="#fde047"/></marker></defs>${tacPitch()}${els.map((e,i)=>e.t==='f'?tacEl(e,i,i===sel):'').join('')}${els.map((e,i)=>e.t!=='f'?tacEl(e,i,i===sel):'').join('')}</svg>`}
 R.tacticas=function(){killCharts&&killCharts();S.tacticas=S.tacticas||[];if(tac){tacEditor();return}
- $('#app').innerHTML=`<div class="sec"><h2>Tácticas y estrategias</h2><button class="btn" onclick="tac=nuevaTac();R.tacticas()">+ Nueva táctica</button></div><p class="muted" style="margin-top:-6px">Dibuja jugadas y sistemas en el campo de fútbol 7: mueve jugadores, balón y flechas, y guárdalas para tenerlas siempre a mano.</p>${S.tacticas.length?`<div class="grid">${S.tacticas.map(t=>`<div class="card"><span class="tag am">${esc(t.fase)}</span><div style="margin:10px 0">${tacSvg(t.els,-1)}</div><h3 style="margin:6px 0">${esc(t.nombre||'Sin título')}</h3>${t.desc?`<p class="muted" style="font-size:13px">${esc(t.desc.slice(0,120))}${t.desc.length>120?'…':''}</p>`:''}<button class="btn" onclick="tac=JSON.parse(JSON.stringify(S.tacticas.find(x=>x.id==='${t.id}')));tac.sel=null;R.tacticas()">Abrir y editar</button> <button class="btn alt" onclick="dupTac('${t.id}')">Duplicar</button> <button class="btn del" onclick="delTac('${t.id}')">Borrar</button></div>`).join('')}</div>`:emptyS('Aún no hay tácticas','Crea la primera con «Nueva táctica». Puedes empezar con una formación 1-2-3-1.')}<p class="muted" style="margin-top:14px"><a style="cursor:pointer;text-decoration:underline" onclick="toast(addTacEj()?'Tácticas de ejemplo añadidas':'Ya tienes las tácticas de ejemplo');save();R.tacticas()">Añadir 12 tácticas de ejemplo con cómo hacerlas y practicarlas: salida de balón, ataque, defensa, transiciones y balón parado</a></p>`};
+ $('#app').innerHTML=`<div class="sec"><h2>Tácticas y estrategias</h2><button class="btn" onclick="tac=nuevaTac();R.tacticas()">+ Nueva táctica</button></div><p class="muted" style="margin-top:-6px">Dibuja jugadas y sistemas en el campo de fútbol 7: mueve jugadores, balón y flechas, y guárdalas para tenerlas siempre a mano.</p>${S.tacticas.length?`<div class="grid">${S.tacticas.map(t=>`<div class="card"><span class="tag am">${esc(t.fase)}</span><div style="margin:10px 0">${tacSvg(t.els,-1)}</div><h3 style="margin:6px 0">${esc(t.nombre||'Sin título')}</h3>${t.desc?`<p class="muted" style="font-size:13px">${esc(t.desc.slice(0,120))}${t.desc.length>120?'…':''}</p>`:''}<button class="btn" onclick="tac=JSON.parse(JSON.stringify(S.tacticas.find(x=>x.id==='${t.id}')));tac.sel=null;R.tacticas()">Abrir y editar</button> <button class="btn alt" onclick="dupTac('${t.id}')">Duplicar</button> <button class="btn del" onclick="delTac('${t.id}')">Borrar</button></div>`).join('')}</div>`:emptyS('Aún no hay tácticas','Crea la primera con «Nueva táctica». Puedes empezar con una formación 1-2-3-1.')}<p class="muted" style="margin-top:14px"><a style="cursor:pointer;text-decoration:underline" onclick="toast(addTacEj()?'Tácticas de ejemplo añadidas':'Ya tienes las tácticas de ejemplo');save();R.tacticas()">Añadir 13 tácticas de ejemplo con cómo hacerlas y practicarlas: salida de balón, ataque, defensa, transiciones y balón parado</a></p>`};
 function dupTac(i){const t=S.tacticas.find(x=>x.id===i);if(!t)return;const c=JSON.parse(JSON.stringify(t));c.id=id();c.nombre=(t.nombre||'Táctica')+' (copia)';S.tacticas.push(c);save();toast('Táctica duplicada');R.tacticas()}
 function delTac(i){if(!confirm('¿Borrar esta táctica?'))return;S.tacticas=S.tacticas.filter(x=>x.id!==i);save();R.tacticas()}
 function tacPt(ev){const svg=document.getElementById('tsvg'),p=svg.createSVGPoint();p.x=ev.clientX;p.y=ev.clientY;const q=p.matrixTransform(svg.getScreenCTM().inverse());return{x:Math.max(12,Math.min(588,q.x)),y:Math.max(12,Math.min(388,q.y))}}
@@ -1666,7 +1666,36 @@ els:[P(555,200,'b',1,{gk:true}),P(500,130,'b',2),P(500,270,'b',3),P(430,200,'b',
  X(300,40,'Presión alta en bloque'),X(150,368,'Empujar hacia la banda')]}
 ]}
 
-function addTacEj(){S.tacticas=S.tacticas||[];let n=0;tacEjemplos().concat(tacEjemplos2()).forEach(t=>{if(!S.tacticas.some(x=>x.nombre===t.nombre)){S.tacticas.push({id:id(),sel:null,...t});n++}});S.tacEj=3;return n}
+
+function tacEjemplos3(){const P=(x,y,eq,n,o)=>({t:'p',x,y,eq,n:String(n),...(o||{})}),F=(x1,y1,x2,y2,st)=>({t:'f',x1,y1,x2,y2,st:st||'pase'}),X=(x,y,s)=>({t:'x',x,y,s});
+return[{nombre:'Salida desde la portería (saque de meta) con el benjamín',fase:'Salida de balón',
+desc:`Qué es: cómo reiniciar el juego desde el saque de meta, jugando por abajo con el portero como primer pasador.
+
+Reglamento de fútbol 7 (RFFM): el balón se coloca en cualquier punto del área de meta y está en juego cuando se golpea con el pie y se mueve; los rivales deben estar fuera del área de penalti hasta entonces; no vale gol directo de saque de meta. En benjamín no hay saque de volea, como sí lo hay en prebenjamín.
+
+Cómo se hace (1-2-3-1):
+1) El portero (1) coloca el balón en un lado del área de meta y mira dónde está la presión rival.
+2) Los dos defensas (2 y 3) se abren, uno a cada lado del área, para ofrecer un pase raso y seguro.
+3) El mediocentro (5) se ofrece de cara, por delante del delantero rival, como segunda opción.
+4) Los interiores (4 y 6) se abren a las bandas para dar amplitud y el delantero (7) fija a los centrales rivales.
+5) Primer pase al defensa libre, segundo pase al interior o al mediocentro; después, a progresar.
+Si todo está cerrado: pase largo a la banda donde hay más espacio, para que el equipo lo pelee junto, sin dejar solo al delantero.
+
+Cómo practicarla:
+- Fase 1, sin rival: portero y 5 jugadores repiten la colocación y el primer pase a cada lado; después se cambia de lado en cada saque.
+- Fase 2, con un delantero rival pasivo y luego activo fuera del área: el portero elige el lado libre.
+- Fase 3, 5x5 o 6x6 con portería: todo saque de meta se juega corto; si el equipo completa tres pases sin pérdida, vale un punto extra.
+- Alternar quién saca: que todos los porteros y los defensas lo prueben.
+
+Consignas: el portero mira antes de pasar y no se precipita; pase raso, fuerte y al pie bueno; los defensas se ofrecen abiertos y de cara; si hay presión, pase al lado libre o largo a la banda; tras perder el balón, presión inmediata de los más cercanos.
+
+Indicador: sacar jugando por abajo sin perder el balón en el primer pase en 3 de 5 saques de meta.`,
+els:[P(40,200,'a',1,{gk:true}),P(135,120,'a',2),P(135,280,'a',3),P(235,90,'a',4),P(225,200,'a',5),P(235,310,'a',6),P(335,200,'a',7),
+ P(135,200,'b',7),P(160,100,'b',4),P(160,300,'b',6),P(260,200,'b',5),P(480,200,'b',3),P(570,200,'b',1,{gk:true}),
+ {t:'b',x:52,y:212},
+ F(54,206,124,132,'pase'),F(148,124,224,98,'pase'),F(238,208,256,262,'carrera'),F(230,300,300,270,'pase'),F(335,206,300,170,'carrera'),
+ X(300,40,'Saque de meta: rivales fuera del área'),X(150,372,'1.º pase al defensa libre'),X(450,350,'Opción: pase largo a banda')]}]}
+function addTacEj(){S.tacticas=S.tacticas||[];let n=0;tacEjemplos().concat(tacEjemplos2(),tacEjemplos3()).forEach(t=>{if(!S.tacticas.some(x=>x.nombre===t.nombre)){S.tacticas.push({id:id(),sel:null,...t});n++}});S.tacEj=4;return n}
 
 /* ====== NAVEGACION: ATRAS, GUARDAR Y CANCELAR ====== */
 const navHist=[];let navSkip=false;

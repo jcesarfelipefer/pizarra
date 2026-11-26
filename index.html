@@ -204,6 +204,19 @@ nav button.on{background:var(--accent-soft);color:var(--accent)}
 /* ====== Accesos rápidos: solo un área ====== */
 #app .hero.hero2::after{left:auto;right:0;width:46%;background:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 260 400%22%3E%3Cg fill=%22none%22 stroke=%22%23fff%22 stroke-width=%221.5%22 vector-effect=%22non-scaling-stroke%22%3E%3Cpath d=%22M240 0V400%22 vector-effect=%22non-scaling-stroke%22/%3E%3Crect x=%22100%22 y=%2260%22 width=%22140%22 height=%22280%22 vector-effect=%22non-scaling-stroke%22/%3E%3Crect x=%22190%22 y=%22140%22 width=%2250%22 height=%22120%22 vector-effect=%22non-scaling-stroke%22/%3E%3Cpath d=%22M100 164A70 70 0 0 0 100 236%22 vector-effect=%22non-scaling-stroke%22/%3E%3Crect x=%22240%22 y=%22170%22 width=%2214%22 height=%2260%22 vector-effect=%22non-scaling-stroke%22/%3E%3C/g%3E%3Ccircle cx=%22160%22 cy=%22200%22 r=%223%22 fill=%22%23fff%22/%3E%3C/svg%3E") right center/auto 135% no-repeat;opacity:.34;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 40%);mask-image:linear-gradient(90deg,transparent 0,#000 40%)}
 @media(max-width:700px){#app .hero.hero2::after{left:auto;width:60%;opacity:.22;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 55%);mask-image:linear-gradient(90deg,transparent 0,#000 55%)}}
+/* ====== Accesos rápidos sin huecos ====== */
+#app .hero2 .acts{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;width:100%}
+#app .hero2 .acts .btn{width:100%;margin:0;justify-content:center;text-align:center;white-space:normal;min-height:44px}
+@media(max-width:700px){#app .hero2 .acts{grid-template-columns:repeat(2,1fr)}#app .hero2 .acts .btn:last-child:nth-child(odd){grid-column:1/-1}}
+/* ====== Histórico por categorías ====== */
+details.hcat{margin:0 0 12px;border:1px solid var(--line);border-radius:14px;background:var(--surface);overflow:hidden}
+details.hcat>summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px;padding:14px 16px;font-weight:700}
+details.hcat>summary::-webkit-details-marker{display:none}
+details.hcat>summary::after{content:"▾";margin-left:auto;color:var(--muted);transition:transform .2s}
+details.hcat[open]>summary::after{transform:rotate(180deg)}
+details.hcat .dot{width:12px;height:12px;border-radius:50%}
+details.hcat .cnt{font-weight:600;color:var(--muted);font-size:13px}
+details.hcat .hgrid{padding:0 14px 14px}
 </style>
 </head>
 <body>
@@ -1957,5 +1970,16 @@ Object.keys(R).forEach(k=>{const _o=R[k];R[k]=function(){const r=_o.apply(this,a
 
 /* ====== ORDEN del menú ====== */
 {const ord=['inicio','partidos','sesiones','tacticas','jugadores','calendario'];const en=Object.entries(TABS);const nuevo=ord.filter(k=>k in TABS).map(k=>[k,TABS[k]]).concat(en.filter(([k])=>!ord.includes(k)));Object.keys(TABS).forEach(k=>delete TABS[k]);nuevo.forEach(([k,v])=>TABS[k]=v);try{nav()}catch(e){}}
+
+/* ====== HISTÓRICO agrupado por tipo de tarea ====== */
+let hfTipo='';
+{const _rh=R.historico;R.historico=function(){_rh.apply(this,arguments);const g=document.querySelector('#app .hgrid');if(!g||g.dataset.agr)return;
+ const sel=document.getElementById('hc');const cards=[...g.querySelectorAll(':scope>.hcard')];const orden=['ofe','def','con','fis','cal','vue','sin'];const grp={};
+ cards.forEach(c=>{const m=(c.innerHTML.match(/abrirT\('([^']+)'\)/)||[])[1];const T=S.tareas.find(x=>x.id===m);const k=tipoTarea(T,null,null);(grp[k]=grp[k]||[]).push(c)});
+ if(sel){const n=document.createElement('select');n.id='hct';n.style.maxWidth='220px';n.innerHTML='<option value="">Todas las categorías</option>'+orden.filter(k=>TIPOSE[k]).map(k=>`<option value="${k}" ${hfTipo===k?'selected':''}>${TIPOSE[k].n}</option>`).join('');n.onchange=e=>{hfTipo=e.target.value;R.historico()};sel.replaceWith(n)}
+ const q=(hf&&hf.q)||'';const frag=document.createElement('div');
+ orden.filter(k=>grp[k]&&(!hfTipo||hfTipo===k)).forEach(k=>{const dt=document.createElement('details');dt.className='hcat';if(q||hfTipo)dt.open=true;const T=TIPOSE[k]||{n:k,c:'#94a3b8'};dt.innerHTML=`<summary><span class="dot" style="background:${T.c}"></span>${esc(T.n)}<span class="cnt">${grp[k].length} ${grp[k].length==1?'tarea':'tareas'}</span></summary>`;const gg=document.createElement('div');gg.className='hgrid';gg.dataset.agr='1';grp[k].forEach(c=>gg.appendChild(c));dt.appendChild(gg);frag.appendChild(dt)});
+ if(!frag.children.length){return}
+ g.replaceWith(frag)}}
 </script>
 </body></html>

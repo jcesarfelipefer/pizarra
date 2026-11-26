@@ -1892,5 +1892,14 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')tacHorizCerrar()});
 {const _rt=R.tacticas;R.tacticas=function(){_rt.apply(this,arguments);const a=document.getElementById('app');if(!a)return;
  if(tac){const g=[...a.querySelectorAll('button')].find(x=>/Guardar táctica/.test(x.textContent));if(g&&!a.querySelector('.btn-horiz')){const b=document.createElement('button');b.type='button';b.className='btn alt btn-horiz';b.textContent='Ver en horizontal';b.onclick=()=>tacHoriz(tac.els,tac.nombre);g.after(' ',b)}return}
  a.querySelectorAll('button').forEach(x=>{const m=/dupTac\('([^']+)'\)/.exec(x.getAttribute('onclick')||'');if(!m||x.nextElementSibling&&x.nextElementSibling.classList.contains('btn-horiz'))return;const b=document.createElement('button');b.type='button';b.className='btn alt btn-horiz';b.textContent='Ver en horizontal';b.onclick=()=>{const t=S.tacticas.find(y=>y.id===m[1]);if(t)tacHoriz(t.els,t.nombre)};x.after(' ',b)})}}
+
+/* ====== PARTIDOS: partido de la semana al principio ====== */
+function partidoSemana(){const L=(S.partidos||[]).slice().sort((a,b)=>(a.fecha+(a.hora||''))<(b.fecha+(b.hora||''))?-1:1),hoy=todayS(),d=pd(hoy),dow=(d.getDay()+6)%7,lun=addD(hoy,-dow),dom=addD(lun,6);
+ const sem=L.filter(x=>x.fecha>=lun&&x.fecha<=dom);if(sem.length){const fut=sem.find(x=>x.fecha>=hoy);return{p:fut||sem[sem.length-1],t:'Partido de esta semana'}}
+ const pr=L.find(x=>x.fecha>hoy);return pr?{p:pr,t:'Próximo partido'}:null}
+{const _rp=R.partidos;R.partidos=function(){_rp.apply(this,arguments);const a=document.getElementById('app');if(!a||document.getElementById('fp')||document.getElementById('partSem'))return;const r=partidoSemana();if(!r)return;const x=r.p,cita=(x.prep&&x.prep.citaMan&&x.prep.cita)||citaAuto(x),jug=x.gf!==''&&x.gf!=null;
+ const c=document.createElement('div');c.id='partSem';c.className='card';c.style.cssText='margin:0 0 22px;border:2px solid var(--pri,#1f4e8c)';
+ c.innerHTML=`<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center"><b style="color:var(--pri,#1f4e8c)">${r.t}</b><span class="muted">${fmt(x.fecha)}${x.hora?' · '+esc(x.hora):''}${cita?' · citación '+esc(cita):''}</span></div><h3 style="margin:8px 0 4px;font-size:20px">${x.sede==='fuera'?'@ ':'vs '}${esc(x.rival)}</h3><div class="muted" style="font-size:13px">${esc(x.comp||'Partido')}${x.sede==='fuera'?' · Fuera':' · En casa'}${jug?' · Resultado '+x.gf+' – '+x.gc:''}</div><div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn" style="margin:0" onclick="prepPartido('${x.id}')">Preparar partido</button><button type="button" class="btn alt" style="margin:0" onclick="pe='${x.id}';R.partidos()">${jug?'Ver partido':'Anotar resultado y minutos'}</button></div>`;
+ const sec=a.querySelector('.sec');if(sec)sec.before(c);else a.querySelector('h2').after(c)}}
 </script>
 </body></html>

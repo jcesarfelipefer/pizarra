@@ -67,7 +67,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;p
 .kpi{font-family:'Cabinet Grotesk',sans-serif;font-size:30px;font-weight:800;line-height:1;letter-spacing:-.5px}
 .kpi-card small{color:var(--muted);font-size:13px}
 .hero{border-radius:20px;padding:26px 28px;margin-bottom:22px;background:linear-gradient(135deg,#0b1f44,#1f4e8c 60%,#2f6bb5);color:#fff;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center;position:relative;overflow:hidden}
-.hero::after{content:"";position:absolute;right:-60px;top:-40px;width:280px;height:280px;border-radius:50%;border:30px solid rgba(255,255,255,.07)}
+.hero::after{pointer-events:none;content:"";position:absolute;right:-60px;top:-40px;width:280px;height:280px;border-radius:50%;border:30px solid rgba(255,255,255,.07)}
 .hero h2{color:#fff;margin:0 0 4px;font-size:30px}.hero p{margin:0;opacity:.85}
 .hero .btn{background:#fff;color:#0b1f44;margin:0}.hero .btn.alt{background:rgba(255,255,255,.14);color:#fff;border-color:rgba(255,255,255,.3)}
 .hero .acts{display:flex;gap:10px;flex-wrap:wrap;position:relative;z-index:1}
@@ -1849,5 +1849,19 @@ function irNuevaSesion(){const f=document.getElementById('f');if(!f)return;f.scr
 /* ====== CALENDARIO: botón Nueva sesión ====== */
 function nuevaSesionDesde(){go('sesiones');setTimeout(irNuevaSesion,60)}
 {const _rc=R.calendario;R.calendario=function(){_rc.apply(this,arguments);const h=document.querySelector('#app h2');if(!h||document.getElementById('btnNuevaSesCal'))return;const w=document.createElement('div');w.className='noprint';w.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:0 0 10px';h.style.margin='0';h.before(w);w.appendChild(h);const b=document.createElement('button');b.type='button';b.id='btnNuevaSesCal';b.className='btn';b.style.margin='0';b.innerHTML='<span style="font-size:18px;line-height:1;margin-right:6px">+</span>Nueva sesión';b.onclick=nuevaSesionDesde;w.appendChild(b)}}
+
+/* ====== TÁCTICAS: ver la pizarra en horizontal ====== */
+function tacHorizCerrar(){const d=document.getElementById('tacFull');if(d)d.remove();window.removeEventListener('resize',tacHorizRe);try{if(document.fullscreenElement)document.exitFullscreen();if(screen.orientation&&screen.orientation.unlock)screen.orientation.unlock()}catch{}}
+let _tacHE=null;function tacHorizRe(){if(_tacHE&&document.getElementById('tacFull'))tacHoriz(_tacHE.els,_tacHE.nombre,true)}
+function tacHoriz(els,nombre,re){_tacHE={els,nombre};const o=document.getElementById('tacFull');if(o)o.remove();
+ const W=innerWidth,H=innerHeight,port=H>W;const d=document.createElement('div');d.id='tacFull';d.style.cssText='position:fixed;inset:0;z-index:9999;background:#0b1f44;overflow:hidden';
+ const fr=document.createElement('div');fr.style.cssText=port?`position:absolute;top:0;left:0;width:${H}px;height:${W}px;transform-origin:top left;transform:translateX(${W}px) rotate(90deg);display:flex;flex-direction:column;padding:8px;box-sizing:border-box`:`position:absolute;inset:0;display:flex;flex-direction:column;padding:8px;box-sizing:border-box`;
+ fr.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;color:#fff;margin-bottom:6px"><b style="font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(nombre||'Pizarra')}</b><button type="button" class="btn alt" style="margin:0;background:#fff;color:#0b1f44" onclick="tacHorizCerrar()">Cerrar</button></div><div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center">${tacSvg(els,-1).replace('style="width:100%;height:auto;display:block;','style="max-width:100%;max-height:100%;width:auto;height:100%;display:block;aspect-ratio:3/2;')}</div>`;
+ d.appendChild(fr);document.body.appendChild(d);
+ if(!re){window.addEventListener('resize',tacHorizRe);try{const r=d.requestFullscreen&&d.requestFullscreen();if(r&&r.then)r.then(()=>{try{screen.orientation.lock('landscape').catch(()=>{})}catch{}}).catch(()=>{})}catch{}}}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')tacHorizCerrar()});
+{const _rt=R.tacticas;R.tacticas=function(){_rt.apply(this,arguments);const a=document.getElementById('app');if(!a)return;
+ if(tac){const g=[...a.querySelectorAll('button')].find(x=>/Guardar táctica/.test(x.textContent));if(g&&!a.querySelector('.btn-horiz')){const b=document.createElement('button');b.type='button';b.className='btn alt btn-horiz';b.textContent='Ver en horizontal';b.onclick=()=>tacHoriz(tac.els,tac.nombre);g.after(' ',b)}return}
+ a.querySelectorAll('button').forEach(x=>{const m=/dupTac\('([^']+)'\)/.exec(x.getAttribute('onclick')||'');if(!m||x.nextElementSibling&&x.nextElementSibling.classList.contains('btn-horiz'))return;const b=document.createElement('button');b.type='button';b.className='btn alt btn-horiz';b.textContent='Ver en horizontal';b.onclick=()=>{const t=S.tacticas.find(y=>y.id===m[1]);if(t)tacHoriz(t.els,t.nombre)};x.after(' ',b)})}}
 </script>
 </body></html>

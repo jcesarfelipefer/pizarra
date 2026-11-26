@@ -446,7 +446,7 @@ R.partidos=function(){S.partidos=S.partidos||[];const L=[...S.partidos].sort((a,
  ${S.jugadores.length?`<div class="scroll"><table style="margin-top:10px"><tr><th>Jugador</th><th style="width:90px">Titular</th><th style="width:130px">Minutos</th><th style="width:80px">Goles</th><th style="width:80px">Asist.</th></tr>${S.jugadores.map(j=>`<tr><td><b>${esc(j.nombre)}</b> <span class="muted">${esc(j.pos)}</span></td><td><input type="checkbox" name="t_${j.id}" ${p.tit?.[j.id]?'checked':''} style="width:auto"></td><td><input type="number" min="0" name="m_${j.id}" value="${p.mins?.[j.id]??''}" placeholder="0"></td><td><input type="number" min="0" name="g_${j.id}" value="${p.gol?.[j.id]??''}" placeholder="0"></td><td><input type="number" min="0" name="a_${j.id}" value="${p.ast?.[j.id]??''}" placeholder="0"></td></tr>`).join('')}</table></div><button type="button" class="btn alt sm" onclick="document.querySelectorAll('#fp [name^=m_]').forEach(i=>i.value=$('#pdur').value)">Todos jugaron el partido completo</button>`:'<p class="muted">Añade jugadores primero para anotar sus minutos.</p>'}
  <div class="row" style="margin-top:6px"><button class="btn">Guardar partido</button><button type="button" class="btn alt" onclick="formPartido('','${p.id}')">Editar datos</button><button type="button" class="btn alt" onclick="pe=null;R.partidos()">Cerrar</button></div></form>`:''}
  <div class="sec" style="margin-top:${p?'22px':'0'}"><h3>Calendario de partidos</h3><button class="btn" style="margin:0" onclick="formPartido(todayS())">${ico('plus')}Nuevo partido</button></div>
- ${L.length?`<div class="grid">${L.map(x=>{const _y=x.fecha.slice(0,4),_h=_y!==_ya?`<h3 style="grid-column:1/-1;margin:${_ya?'14px':'0'} 0 0;color:var(--pri,#1f4e8c)">Año ${_y}</h3>`:'';_ya=_y;const tot=Object.values(x.mins||{}).reduce((a,v)=>a+(+v||0),0),n=Object.values(x.mins||{}).filter(v=>+v>0).length;return _h+`<div class="card" style="cursor:pointer" onclick="pe='${x.id}';R.partidos()"><div class="row" style="align-items:center"><span class="tag am">${esc(x.comp||'Partido')}</span><span class="muted" style="text-align:right">${fmt(x.fecha)}${x.hora?' · '+esc(x.hora):''}</span></div><h3 style="margin:10px 0 4px">${x.sede==='fuera'?'@ ':'vs '}${esc(x.rival)}</h3><div>${res(x)}</div><div class="muted" style="font-size:13px;margin-top:6px">${n?n+' jugadores · '+tot+' min repartidos':'Minutos sin anotar'}</div><button class="btn del" onclick="event.stopPropagation();delP('${x.id}')">Borrar</button></div>`}).join('')}</div>`:emptyS('Todavía no hay partidos','Añade el primero para empezar a registrar minutos y verlos en la evolución.')}`;
+ ${L.length?`<div class="grid">${L.map(x=>{const _y=x.fecha.slice(0,4),_h=_y!==_ya?`<h3 style="grid-column:1/-1;margin:${_ya?'14px':'0'} 0 0;color:var(--pri,#1f4e8c)">Año ${_y}</h3>`:'';_ya=_y;const tot=Object.values(x.mins||{}).reduce((a,v)=>a+(+v||0),0),n=Object.values(x.mins||{}).filter(v=>+v>0).length;return _h+`<div class="card" style="cursor:pointer" onclick="pe='${x.id}';R.partidos()"><div class="row" style="align-items:center"><span class="tag am" style="border-radius:8px;white-space:normal;line-height:1.35;padding:5px 9px;flex:1 1 55%;min-width:0">${esc(x.comp||'Partido')}</span><span class="muted" style="text-align:right;flex:0 0 auto">${fmt(x.fecha)}${x.hora?' · '+esc(x.hora):''}</span></div><h3 style="margin:10px 0 4px">${x.sede==='fuera'?'@ ':'vs '}${esc(x.rival)}</h3><div>${res(x)}</div><div class="muted" style="font-size:13px;margin-top:6px">${n?n+' jugadores · '+tot+' min repartidos':'Minutos sin anotar'}</div><button class="btn del" onclick="event.stopPropagation();delP('${x.id}')">Borrar</button></div>`}).join('')}</div>`:emptyS('Todavía no hay partidos','Añade el primero para empezar a registrar minutos y verlos en la evolución.')}`;
  if(p&&$('#fp'))$('#fp').onsubmit=e=>{e.preventDefault();const f=new FormData(e.target);p.gf=f.get('gf');p.gc=f.get('gc');p.dur=+f.get('dur')||90;p.mins={};p.tit={};p.gol={};p.ast={};S.jugadores.forEach(j=>{const g=+f.get('g_'+j.id)||0,a=+f.get('a_'+j.id)||0;if(g)p.gol[j.id]=g;if(a)p.ast[j.id]=a;const v=f.get('m_'+j.id);if(v!==''&&v!=null)p.mins[j.id]=Math.min(+v,p.dur);if(f.get('t_'+j.id))p.tit[j.id]=1});save();toast('Partido guardado');R.partidos()}};
 function delP(i){const old=S.partidos.slice();S.partidos=S.partidos.filter(x=>x.id!==i);if(pe===i)pe=null;save();R.partidos();toast('Partido eliminado',()=>{S.partidos=old;save();R.partidos()})}
 
@@ -1050,7 +1050,7 @@ function addEjemplos(){const n=ejemplosWeb();save();toast(n?n+' tareas de ejempl
 /*EJ_END*/
 
 /*ED_START*/
-function minimizarJug(){let ch=false;(S.jugadores||[]).forEach(j=>{if('anio' in j||'peso' in j||'altura' in j||'notas' in j){if(/capit/i.test(j.notas||''))j.cap=1;delete j.anio;delete j.peso;delete j.altura;delete j.notas;ch=true}});return ch}
+function minimizarJug(){let ch=false;(S.jugadores||[]).forEach(j=>{if('anio' in j||'peso' in j||'altura' in j||'notas' in j){if(/capit/i.test(j.notas||''))j.cap=1;delete j.anio;delete j.peso;delete j.altura;delete j.notas;ch=true}});const J=S.jugadores||[],pn=n=>String(n||'').trim().split(/\s+/)[0];J.forEach(j=>{const f=pn(j.nombre);if(f&&f!==String(j.nombre||'').trim()){const ap=String(j.nombre).trim().split(/\s+/)[1]||'';const dup=J.some(o=>o!==j&&pn(o.nombre).toLowerCase()===f.toLowerCase());j.nombre=dup&&ap?f+' '+ap[0].toUpperCase()+'.':f;ch=true}});return ch}
 function nombreVista(){const l=lkGet();return (typeof gd!=='undefined'&&gd.on&&gd.nombre)||S.nombre||(typeof gd!=='undefined'&&gd.nombre)||(l&&l.u?l.u.charAt(0).toUpperCase()+l.u.slice(1):'')||''}
 function cambiarNombre(){openModal(`<div class="mh"><h3>¿Cómo te llamas?</h3><button class="icon-btn" aria-label="Cerrar" onclick="closeModal()">×</button></div><form id="fnom"><label>Tu nombre</label><input name="n" value="${esc(S.nombre||nombreVista())}" placeholder="Ej.: Carlos" autocomplete="off"><button class="btn">Guardar</button> <button type="button" class="btn alt" onclick="S.nombre='';save();closeModal();R.inicio()">Usar el de Google</button></form>`);$('#fnom').onsubmit=e=>{e.preventDefault();S.nombre=new FormData(e.target).get('n').trim();if(typeof gd!=='undefined'&&gd.on){gd.nombre=S.nombre||gd.nombre;gdCfg()}save();closeModal();R.inicio();toast('Nombre guardado')}}
 {const _gi=typeof gdInit==='function'?gdInit:null;if(_gi)gdInit=async function(){await _gi();if(gd.on&&gd.tok&&!gd.nombre){try{const r=await gdApi('https://www.googleapis.com/drive/v3/about?fields=user(displayName)');const j=await r.json();const n=((j.user&&j.user.displayName)||'').split(' ')[0];if(n){gd.nombre=n;if(tab==='inicio')R.inicio()}}catch{}}}}
@@ -1363,19 +1363,19 @@ R.sesiones=function(){_ses0();const box=document.getElementById('lista');if(!box
 
 /* ====== PLANTILLA / MINUTOS IMPORTADOS ====== */
 const PLANTILLA=[
- {n:'Eizan Zarzalejo',d:1,pos:'Portero',min:200,pct:100},
- {n:'Alex Pérez',d:19,min:96,pct:64,cap:1,k:'alex'},
- {n:'Iván Crespo',d:18,min:133,pct:66.5},
+ {n:'Eizan',d:1,pos:'Portero',min:200,pct:100},
+ {n:'Alex',d:19,min:96,pct:64,cap:1,k:'alex'},
+ {n:'Iván',d:18,min:133,pct:66.5},
  {n:'Mauro',d:17,min:92,pct:61.3,k:'mauro'},
- {n:'Aylan Mezouri',d:25,min:119,pct:59.5},
- {n:'Ziad El Haddad',d:3,min:91,pct:60.6},
- {n:'Marco Ortiz',d:27,min:28,pct:56},
- {n:'Helio Izquierdo',d:16,min:93,pct:62},
- {n:'Moussa Diarra',d:24,min:142,pct:71},
- {n:'Adrián Gómez',d:26,min:129,pct:64.5},
- {n:'Román Cabrera',d:21,min:95,pct:47.5},
- {n:'Charlie Mateo',d:20,min:116,pct:58},
- {n:'Emanuel Barrera',d:23,min:66,pct:44}];
+ {n:'Aylan',d:25,min:119,pct:59.5},
+ {n:'Ziad',d:3,min:91,pct:60.6},
+ {n:'Marco',d:27,min:28,pct:56},
+ {n:'Helio',d:16,min:93,pct:62},
+ {n:'Moussa',d:24,min:142,pct:71},
+ {n:'Adrián',d:26,min:129,pct:64.5},
+ {n:'Román',d:21,min:95,pct:47.5},
+ {n:'Charlie',d:20,min:116,pct:58},
+ {n:'Emanuel',d:23,min:66,pct:44}];
 function importarPlantilla(){const norm=t=>String(t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');let nuevos=0,act=0;
  PLANTILLA.forEach(p=>{const pri=norm(p.k||p.n.split(' ')[0]);let j=S.jugadores.find(x=>norm(x.nombre).split(' ')[0]===pri);
   if(!j){j={id:id(),nombre:p.n,dorsal:p.d,pos:p.pos||'',cap:p.cap?1:0};S.jugadores.push(j);nuevos++}else{act++;if(!j.dorsal)j.dorsal=p.d;if(p.pos&&!j.pos)j.pos=p.pos;if(p.cap)j.cap=1}

@@ -1840,5 +1840,9 @@ function irNuevaSesion(){const f=document.getElementById('f');if(!f)return;f.scr
  l.style.marginTop='0';l.style.marginBottom='18px';f.before(l);const ej=[...a.children].find(x=>x.tagName==='P'&&/sesiones de ejemplo/.test(x.textContent));if(ej)f.before(ej);
  if(!document.getElementById('hNueva')){}
 }}
+
+/* ====== INICIO: bloque de accesos separado del saludo ====== */
+{const _ri2=R.inicio;R.inicio=function(){_ri2.apply(this,arguments);const h=document.querySelector('#app .hero');const a=h&&h.querySelector('.acts');if(!a||h.classList.contains('hero2'))return;
+ const d=document.createElement('div');d.className='hero hero2';d.style.padding='18px 20px';d.innerHTML='<div style="width:100%;position:relative;z-index:1"><p style="font-weight:600;margin:0 0 10px;opacity:.9">Accesos rápidos</p></div>';d.firstChild.appendChild(a);h.after(d);h.style.marginBottom='12px'}}
 </script>
 </body></html>

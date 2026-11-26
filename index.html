@@ -1350,15 +1350,16 @@ R.datos=function(){_dat0();const l=lkGet(),c=document.createElement('div');c.cla
  const a=document.getElementById('app');a.appendChild(c)};
 
 /* ====== SESIONES: VISTA POR TIPO + AÑADIR A UN DÍA ====== */
-const sesVista={tipo:'todos'};
+const sesVista={tipo:'todos',cuando:'todas'};
 function tipoSesion(s){const o=minTipos(s);let best='sin',bn=0;['ofe','def','con','fis'].forEach(k=>{if((o[k]||0)>bn){bn=o[k];best=k}});if(best==='sin'&&(o.cal||o.vue))best='cal';return best}
 function programarSes(id_){const s=S.sesiones.find(x=>x.id===id_);if(!s)return;openModal(`<div class="mh"><h3>Añadir a un día</h3><button class="icon-btn" aria-label="Cerrar" onclick="closeModal()">×</button></div><p class="muted" style="margin-top:0">Se crea una copia de «${esc(s.obj||s.cat||'la sesión')}» en la fecha que elijas. La original no cambia y la copia empieza sin asistencia ni RPE.</p><form id="fps"><div class="row"><div><label>Fecha</label><input type="date" name="fecha" value="${todayS()}" required></div><div><label>Hora</label><input type="time" name="hora" value="${esc(s.hora||'18:00')}"></div></div><button class="btn">Añadir al calendario</button></form>`);
  $('#fps').onsubmit=e=>{e.preventDefault();const f=new FormData(e.target),c=JSON.parse(JSON.stringify(s));c.id=id();c.fecha=f.get('fecha');c.hora=f.get('hora')||s.hora;delete c.asis;delete c.rpe;delete c.demo;S.sesiones.push(c);save();closeModal();toast('Sesión añadida al '+fmt(c.fecha));R.sesiones()}}
 const _ses0=R.sesiones;
-R.sesiones=function(){_ses0();const box=document.getElementById('lista');if(!box)return;const L=[...S.sesiones].sort((a,b)=>a.fecha<b.fecha?1:-1);if(!L.length)return;
+R.sesiones=function(){_ses0();const box=document.getElementById('lista');if(!box)return;const L0=[...S.sesiones].sort((a,b)=>a.fecha<b.fecha?1:-1);if(!L0.length)return;const hoyC=todayS(),nProx=L0.filter(s=>s.fecha>=hoyC).length,nPas=L0.length-nProx,cu=sesVista.cuando||'todas';const L=cu==='prox'?L0.filter(s=>s.fecha>=hoyC).reverse():cu==='pas'?L0.filter(s=>s.fecha<hoyC):L0;
+ const cuChip=(k,n,c)=>`<button class="${cu===k?'on':''}" onclick="sesVista.cuando='${k}';sesVista.tipo='todos';R.sesiones()">${n} <span class="muted">${c}</span></button>`;
  const g={};L.forEach(s=>(g[tipoSesion(s)]??=[]).push(s));const ord=['ofe','def','con','fis','cal','sin'].filter(k=>g[k]);const v=sesVista.tipo;
  const chip=(k,n,c)=>`<button class="${v===k?'on':''}" onclick="sesVista.tipo='${k}';R.sesiones()">${n} <span class="muted">${k==='todos'?L.length:(g[k]||[]).length}</span></button>`;
- box.innerHTML=`<div class="noprint" style="margin-bottom:10px"><h3 style="margin:0 0 8px">Todas las sesiones por tipo</h3><div class="seg" style="flex-wrap:wrap">${chip('todos','Todas')}${ord.map(k=>chip(k,TIPOSE[k].n)).join('')}</div></div>`+
+ box.innerHTML=`<div class="noprint" style="margin-bottom:10px"><h3 style="margin:0 0 8px">Sesiones</h3><div class="seg" style="flex-wrap:wrap;margin-bottom:12px">${cuChip('todas','Todas',L0.length)}${cuChip('prox','Próximas',nProx)}${cuChip('pas','Pasadas',nPas)}</div><div class="muted" style="font-size:13px;margin-bottom:6px">Por tipo</div><div class="seg" style="flex-wrap:wrap">${chip('todos','Todos')}${ord.map(k=>chip(k,TIPOSE[k].n)).join('')}</div></div>`+
  ord.filter(k=>v==='todos'||v===k).map(k=>`<h3 style="margin:18px 0 8px"><i style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${TIPOSE[k].c};margin-right:8px"></i>${TIPOSE[k].n} <span class="muted">· ${g[k].length} ${g[k].length==1?'sesión':'sesiones'}</span></h3>`+g[k].map(cardSesion).join('')).join('')};
 
 /* ====== PLANTILLA / MINUTOS IMPORTADOS ====== */

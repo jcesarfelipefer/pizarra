@@ -166,16 +166,15 @@ table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;p
 .delta{font-weight:700;color:var(--muted)}.delta.up{color:var(--accent)}.delta.dn{color:var(--danger)}
 @media(max-width:860px){.cgrid.semana{grid-template-columns:1fr}.cgrid.semana .cd{min-height:0}.cgrid.mes{gap:4px}.cgrid.mes .cd{min-height:64px;padding:5px;gap:3px}.cgrid.mes .ev{font-size:0;padding:0;width:8px;height:8px;border-radius:50%;border:0;background:var(--c);display:inline-block}.cgrid.mes .more{font-size:10px}.dow{gap:4px}.cgrid.mes .add{display:none}.cgrid.semana .add{opacity:1}.calbar .sp,.leg{display:none}}
 
-/* ====== CAMPO AZUL (Inicio) ====== */
-#app .hero{background:#1f4e8c!important;background-image:none!important}
-#app .hero::before{content:"";position:absolute;inset:8px;border:2px solid rgba(255,255,255,.8);border-radius:6px;pointer-events:none}
-#app .hero:not(.hero2){background-image:linear-gradient(90deg,transparent calc(50% - 1px),rgba(255,255,255,.7) calc(50% - 1px),rgba(255,255,255,.7) calc(50% + 1px),transparent calc(50% + 1px))!important}
-#app .hero:not(.hero2)::after{content:"";position:absolute;pointer-events:none;right:auto;left:50%;top:50%;width:150px;height:150px;margin:-75px 0 0 -75px;border:2px solid rgba(255,255,255,.6);border-radius:50%;background:none}
-#app .hero.hero2::after{content:"";position:absolute;pointer-events:none;right:8px;top:50%;width:70px;height:130px;margin-top:-65px;border:2px solid rgba(255,255,255,.6);border-right:0;border-radius:0;background:none}
+/* ====== CAMPO VERDE (Inicio) ====== */
+#app .hero{background:#2f8f46 url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 600 400%22 preserveAspectRatio=%22none%22%3E%3Crect width=%22600%22 height=%22400%22 fill=%22%232f8f46%22/%3E%3Crect x=%220%22 width=%2250%22 height=%22400%22 fill=%22%23000%22 opacity=%22.05%22/%3E%3Crect x=%22100%22 width=%2250%22 height=%22400%22 fill=%22%23000%22 opacity=%22.05%22/%3E%3Crect x=%22200%22 width=%2250%22 height=%22400%22 fill=%22%23000%22 opacity=%22.05%22/%3E%3Crect x=%22300%22 width=%2250%22 height=%22400%22 fill=%22%23000%22 opacity=%22.05%22/%3E%3Crect x=%22400%22 width=%2250%22 height=%22400%22 fill=%22%23000%22 opacity=%22.05%22/%3E%3Crect x=%22500%22 width=%2250%22 height=%22400%22 fill=%22%23000%22 opacity=%22.05%22/%3E%3Cg fill=%22none%22 stroke=%22%23fff%22 stroke-width=%222%22 opacity=%22.4%22 vector-effect=%22non-scaling-stroke%22%3E%3Crect x=%2210%22 y=%2210%22 width=%22580%22 height=%22380%22 vector-effect=%22non-scaling-stroke%22/%3E%3Cpath d=%22M300 10v380%22 vector-effect=%22non-scaling-stroke%22/%3E%3Crect x=%2210%22 y=%22110%22 width=%2280%22 height=%22180%22 vector-effect=%22non-scaling-stroke%22/%3E%3Crect x=%22510%22 y=%22110%22 width=%2280%22 height=%22180%22 vector-effect=%22non-scaling-stroke%22/%3E%3Crect x=%2210%22 y=%22165%22 width=%2225%22 height=%2270%22 vector-effect=%22non-scaling-stroke%22/%3E%3Crect x=%22565%22 y=%22165%22 width=%2225%22 height=%2270%22 vector-effect=%22non-scaling-stroke%22/%3E%3C/g%3E%3C/svg%3E") center/100% 100% no-repeat!important}
+#app .hero::before{display:none}
+#app .hero:not(.hero2)::after{content:"";position:absolute;pointer-events:none;right:auto;left:50%;top:50%;width:90px;height:90px;margin:-45px 0 0 -45px;border:2px solid rgba(255,255,255,.4);border-radius:50%;background:none}
+#app .hero.hero2::after{display:none}
 #app .hero>*{position:relative;z-index:1}
-#app .hero .btn.alt{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.4)}
-@media(max-width:700px){#app .hero.hero2::after{display:none}#app .hero:not(.hero2)::after{opacity:.35;left:auto;right:-30px;margin:-75px 0 0 0}}
-@media(max-width:700px){#app .hero:not(.hero2){background-image:linear-gradient(90deg,transparent calc(50% - 1px),rgba(255,255,255,.22) calc(50% - 1px),rgba(255,255,255,.22) calc(50% + 1px),transparent calc(50% + 1px))!important}}
+#app .hero h2,#app .hero p{text-shadow:0 1px 3px rgba(0,0,0,.35)}
+#app .hero .btn.alt{background:rgba(0,0,0,.28);border-color:rgba(255,255,255,.5)}
+@media(max-width:700px){#app .hero:not(.hero2)::after{opacity:.5;left:auto;right:20px;margin:-45px 0 0 0}}
 </style>
 </head>
 <body>

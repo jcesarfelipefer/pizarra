@@ -1832,5 +1832,13 @@ function auxModal(){openModal(`<div class="mh"><h3>Primeros auxilios</h3><button
   const v=Object.values(s.rpe||{}).map(Number).filter(x=>x>0);if(v.length&&avg(v)>=8)A('warn','RPE medio alto para esta edad','La media es '+avg(v).toFixed(1)+'. En niños hay que evitar el trabajo anaeróbico láctico y prolongado; baja la intensidad y alarga la recuperación (orientativo).',FUENTE.ent)}
  A('tip','Seguridad antes de empezar','Comprueba el botiquín, el agua y el teléfono. Con calor, planifica pausas de hidratación. La ficha de primeros auxilios está en Inicio.',FUENTE.aux);
  return out}}
+
+/* ====== SESIONES: lista primero, nueva sesión abajo con botón de salto ====== */
+function irNuevaSesion(){const f=document.getElementById('f');if(!f)return;f.scrollIntoView({behavior:'auto',block:'start'});window.scrollBy(0,-70)}
+{const _s2=R.sesiones;R.sesiones=function(){_s2();const a=document.getElementById('app');const f=document.getElementById('f'),l=document.getElementById('lista');if(!a||!f||!l)return;
+ const h=a.querySelector('h2');if(h&&!document.getElementById('btnNuevaSes')){const w=document.createElement('div');w.className='noprint';w.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:0 0 10px';h.style.margin='0';h.before(w);w.appendChild(h);const b=document.createElement('button');b.type='button';b.id='btnNuevaSes';b.className='btn';b.style.margin='0';b.innerHTML='<span style="font-size:18px;line-height:1;margin-right:6px">+</span>Nueva sesión';b.setAttribute('aria-label','Nueva sesión: ir al formulario');b.onclick=irNuevaSesion;w.appendChild(b)}
+ l.style.marginTop='0';l.style.marginBottom='18px';f.before(l);const ej=[...a.children].find(x=>x.tagName==='P'&&/sesiones de ejemplo/.test(x.textContent));if(ej)f.before(ej);
+ if(!document.getElementById('hNueva')){}
+}}
 </script>
 </body></html>

@@ -1,7 +1,8 @@
 <!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- Pizarra Entrenadores. © 2026 Cesar Felipe Fernández. Todos los derechos reservados. Prohibida su copia, modificación o redistribución sin autorización expresa. -->
+<meta charset="utf-8"><meta name="author" content="Cesar Felipe Fernández"><meta name="copyright" content="© 2026 Cesar Felipe Fernández"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Pizarra · Entrenamientos y preparación física</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%278%27 fill=%27%231f4e8c%27/%3E%3C/svg%3E">
 <script src="vendor/chart.umd.min.js"></script>
@@ -167,8 +168,8 @@ table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;p
 </style>
 </head>
 <body>
-<div class="shell"><aside class="side"><div class="brand"><i><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M12 5v14"/><circle cx="12" cy="12" r="2.5"/></svg></i>Pizarra</div><nav id="nav" aria-label="Secciones"></nav><div class="sidefoot"><b>Consejo</b>Registra cada tarea que uses para ver qué trabajas más.</div></aside>
-<div class="content"><div class="topbar"><span class="mbrand">Pizarra</span><span class="sp"></span><span class="chip" id="estado">Cargando…</span><button class="icon-btn" id="theme" aria-label="Cambiar tema" onclick="toggleTheme()"></button></div><main id="app"><div class="grid"><div class="sk"></div><div class="sk"></div><div class="sk"></div></div></main></div></div><div class="toast" id="toast"></div>
+<div class="shell"><aside class="side"><div class="brand"><i><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M12 5v14"/><circle cx="12" cy="12" r="2.5"/></svg></i>Pizarra</div><nav id="nav" aria-label="Secciones"></nav><div class="sidefoot"><b>Consejo</b>Registra cada tarea que uses para ver qué trabajas más.<div class="copy" style="margin-top:10px">© 2026 Cesar Felipe Fernández</div></div></aside>
+<div class="content"><div class="topbar"><span class="mbrand">Pizarra</span><span class="sp"></span><span class="chip" id="estado">Cargando…</span><button class="icon-btn" id="theme" aria-label="Cambiar tema" onclick="toggleTheme()"></button></div><main id="app"><div class="grid"><div class="sk"></div><div class="sk"></div><div class="sk"></div></div></main><div class="copy">© 2026 Cesar Felipe Fernández. Todos los derechos reservados.</div></div></div><div class="toast" id="toast"></div>
 <script>window.__API_BASE__='__PORT_8000__';</script>
 <script>
 const K='pizarra-v1';
@@ -836,8 +837,9 @@ async function gdTurno(force){const t=await gdTurnoLeer();if(t&&t.dev!==gd.dev&&
 async function gdLiberar(){try{if(!gd.ro){await gdTurnoLeer();await gdTurnoEscribir({dev:gd.dev,nombre:gd.nombre||'',t:0})}gd.ro=true;gd.otro=null;gdBanner();R.datos();toast('Turno liberado')}catch{toast('No se pudo liberar el turno')}}
 async function gdTomar(){const o=gd.otro;if(o&&!confirm(o.nombre+' está editando ahora. Si tomas el turno, él dejará de poder guardar. ¿Seguro?'))return;try{await gdTurno(true);nav();R[tab]&&R[tab]();toast('Tienes el turno de edición')}catch{toast('No se pudo tomar el turno')}}
 async function gdActualizar(){try{const f=gd.fid?{id:gd.fid}:await gdBuscar();if(f){gd.fid=f.id;const d=await gdLeer(f.id);if(d&&d.jugadores)gdCarga(d)}const t=await gdTurnoLeer();if(!t||t.dev===gd.dev||Date.now()-t.t>=GD_TTL){await gdTurno(false)}else{gd.otro=t;gdBanner()}nav();R[tab]&&R[tab]();toast('Datos actualizados')}catch{toast('No se pudo actualizar')}}
-function gdBanner(){let b=document.getElementById('gdban');if(!gd.on||!gd.ro){if(b)b.remove();document.body.classList.remove('gdro');return}
+function gdBanner(){let b=document.getElementById('gdban');if(!gd.on||!gd.ro){gd.avisado=false;const mm=document.getElementById('gdmod');if(mm)mm.remove();if(b)b.remove();document.body.classList.remove('gdro');return}
  if(!b){b=document.createElement('div');b.id='gdban';document.body.appendChild(b)}document.body.classList.add('gdro');
+ if(!gd.avisado){gd.avisado=true;const m=document.createElement('div');m.id='gdmod';const on=gd.otro?esc(gd.otro.nombre):'Otro entrenador';m.innerHTML='<div><h3>Pizarra en uso</h3><p><b>'+on+'</b> está usando la pizarra ahora mismo. Si tomas el turno, él pasará a solo lectura y podría perder cambios sin guardar.</p><div class="row2"><button class="btn" onclick="document.getElementById(\'gdmod\').remove();gdTomar()">Tomar el turno</button><button class="btn alt" onclick="document.getElementById(\'gdmod\').remove()">Solo mirar</button></div></div>';document.body.appendChild(m)}
  const o=gd.otro;b.innerHTML=(o?'<b>'+esc(o.nombre)+'</b> está editando ahora':'Turno libre')+'. Estás en solo lectura. <button class="btn sm" onclick="gdTomar()">Tomar el turno</button> <button class="btn alt sm" onclick="gdActualizar()">Actualizar</button>'}
 async function gdCopia(){const hoy=todayS(),nom='pizarra-copia-'+hoy+'.json',q=encodeURIComponent("name='"+nom+"' and trashed=false");
  const r=await gdApi('https://www.googleapis.com/drive/v3/files?q='+q+'&fields=files(id)');if(((await r.json()).files||[]).length){gd.copia=hoy;gdCfg();return}
@@ -850,6 +852,7 @@ setInterval(async()=>{if(!gd.on||gd.pend||document.visibilityState!=='visible'||
   else if(!libre){gd.ro=true;gd.otro=t;gdBanner()}
   else{await gdTurnoEscribir({dev:gd.dev,nombre:gd.nombre||'Otro entrenador',t:Date.now()});gd.lastBeat=Date.now()}}catch{}},60000);
 window.addEventListener('pagehide',()=>{try{if(gd.on&&!gd.ro&&gd.tfid&&gd.tok&&gd.exp>Date.now()){fetch('https://www.googleapis.com/upload/drive/v3/files/'+gd.tfid+'?uploadType=media',{method:'PATCH',keepalive:true,headers:{Authorization:'Bearer '+gd.tok,'Content-Type':'application/json'},body:JSON.stringify({dev:gd.dev,nombre:gd.nombre||'',t:0})})}}catch{}});
+{const st0=document.createElement('style');st0.textContent='.copy{font-size:11px;color:#64748b;text-align:center;padding:14px 8px}.sidefoot .copy{text-align:left;padding:0}@media print{.copy{display:none}}#gdmod{position:fixed;inset:0;z-index:9500;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;padding:16px}#gdmod>div{background:#fff;color:#0f172a;border-radius:14px;padding:20px;max-width:380px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,.3)}#gdmod h3{margin:0 0 8px}#gdmod .row2{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}';document.head.appendChild(st0)}
 {const st=document.createElement('style');st.textContent='#gdban{position:fixed;left:0;right:0;top:0;z-index:9000;background:#fff3cd;color:#5c4400;padding:8px 12px;text-align:center;font-size:14px;border-bottom:1px solid #e8c766}body.gdro{padding-top:46px}body.gdro #app input,body.gdro #app select,body.gdro #app textarea,body.gdro #app .btn,body.gdro #modal input,body.gdro #modal select,body.gdro #modal textarea,body.gdro #modal .btn{pointer-events:none;opacity:.55}';document.head.appendChild(st)}
 /*GD_END*/
 

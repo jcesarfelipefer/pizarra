@@ -2019,5 +2019,61 @@ function impSel(m){document.querySelectorAll('.impck').forEach(i=>{i.checked=m==
 {const _rsi=R.sesiones;R.sesiones=function(){_rsi.apply(this,arguments);const b=document.getElementById('btnNuevaSes');const h=b&&b.parentElement;
  if(h&&!document.getElementById('btnImpSes')){const x=document.createElement('button');x.type='button';x.id='btnImpSes';x.className='btn alt';x.style.margin='0';x.textContent='Imprimir';x.onclick=modalImprimir;b.after(x);if(!h.querySelector('.acts2')){b.style.marginRight='8px'}}
  document.querySelectorAll('#lista .card,#lista .scard').forEach(c=>{if(c.querySelector('.btnImpUna'))return;const m=(c.innerHTML.match(/programarSes\('([^']+)'\)/)||[])[1];if(!m)return;const bt=document.createElement('button');bt.type='button';bt.className='btn alt noprint btnImpUna';bt.textContent='Imprimir';bt.onclick=()=>imprimirSesiones([m]);const ref=c.querySelector('button[onclick^="programarSes"]');if(ref)ref.before(bt)})}}
+/* ====== PROPONER SESIÓN (reglas, sin IA externa) ====== */
+let PS=null;
+const PS_VENT=21,PS_REP=14,PS_JUEGO=/partido|juego|reducid|condicion|\b\dv\d\b|\d\s*contra\s*\d|\d\s*vs\s*\d/i;
+function psTipo(T,parte){return tipoTarea(T,parte||'p',null)}
+function psUso(fecha){const u={};(S.sesiones||[]).filter(s=>s.fecha<fecha).forEach(s=>['c','p','v'].forEach(k=>(s.parts?.[k]||[]).forEach(t=>{const T=tareaDe(t);if(!T)return;if(!u[T.id]||u[T.id]<s.fecha)u[T.id]=s.fecha})));return u}
+function psMin(fecha){const d0=addD(fecha,-PS_VENT),o={},last={};(S.sesiones||[]).filter(s=>s.fecha<fecha&&s.fecha>=d0).forEach(s=>{const m=minTipos(s);Object.keys(m).forEach(k=>{o[k]=(o[k]||0)+m[k];if(!last[k]||last[k]<s.fecha)last[k]=s.fecha})});return{o,last,n:(S.sesiones||[]).filter(s=>s.fecha<fecha&&s.fecha>=d0).length}}
+function psRank(pool,fecha,uso){const lim=addD(fecha,-PS_REP);const A=pool.slice().sort((a,b)=>String(uso[a.id]||'0').localeCompare(String(uso[b.id]||'0'))||String(a.titulo).localeCompare(String(b.titulo),'es'));return[...A.filter(T=>!(uso[T.id]>=lim)),...A.filter(T=>uso[T.id]>=lim)]}
+function psPartido(fecha){const P=(S.partidos||[]).filter(p=>p.fecha>=fecha).sort((a,b)=>a.fecha<b.fecha?-1:1)[0];if(!P)return null;const d=Math.round((pd(P.fecha)-pd(fecha))/864e5);return d<=6?{p:P,d}:null}
+function psGenera(o){const{fecha,dur}=o;const T=(S.tareas||[]),uso=psUso(fecha),mt=psMin(fecha),par=psPartido(fecha);const vis=par&&par.d<=2;
+ const tp=T.map(t=>({t,ty:psTipo(t)}));
+ const sesP=(S.sesiones||[]),usada=k=>sesP.flatMap(s=>(s.parts?.[k]||[]).map(tareaDe)).filter(Boolean);
+ const uniq=a=>[...new Map(a.map(x=>[x.id,x])).values()];
+ const poolC=uniq([...tp.filter(x=>x.t.tipo==='cal'||x.ty==='cal').map(x=>x.t),...usada('c')]);
+ const poolV=uniq([...tp.filter(x=>x.t.tipo==='vue'||x.ty==='vue').map(x=>x.t),...usada('v')]);
+ const poolT=k=>tp.filter(x=>x.ty===k&&!poolC.includes(x.t)&&!poolV.includes(x.t)).map(x=>x.t);
+ const cand=['con','ofe','def'].filter(k=>poolT(k).length);
+ let foco=o.foco;let auto=false;
+ if(!foco||foco==='auto'){auto=true;if(!cand.length){foco='con'}else{foco=cand.slice().sort((a,b)=>(mt.o[a]||0)-(mt.o[b]||0)||String(mt.last[a]||'0').localeCompare(String(mt.last[b]||'0')))[0]}}
+ const cal=Math.max(5,Math.round(dur*.17/5)*5),vue=dur>=45?5:0,fin=Math.round(dur*.25/5)*5,rest=dur-cal-vue-fin,m1=Math.round(rest/2/5)*5,m2=rest-m1;
+ const usedIds=new Set();const take=(pool,exc)=>{const R=psRank(pool.filter(t=>!usedIds.has(t.id)),fecha,uso);return R};
+ const pick=pool=>{const R=take(pool);const t=R[0];if(t)usedIds.add(t.id);return t};
+ const otros=cand.filter(k=>k!==foco).sort((a,b)=>(mt.o[a]||0)-(mt.o[b]||0));
+ const mainPool=[...poolT(foco)];
+ let a=pick(mainPool),b=pick(mainPool);if(!b){const alt=otros.length?poolT(otros[0]):[];b=pick(alt)}
+ const finPool=[...poolT(foco),...otros.flatMap(poolT)].filter(t=>PS_JUEGO.test([t.titulo,t.objetivo,t.contenido].join(' ')));
+ let f=pick(finPool.filter(t=>psTipo(t)===foco).length?finPool.filter(t=>psTipo(t)===foco):finPool);if(!f)f=pick(mainPool.length?mainPool:T);
+ const c=pick(poolC),v=vue?pick(poolV):null;
+ const mk=(t,m,ph)=>t?{t:t.titulo,m,tid:t.id}:{t:ph,m};
+ const parts={c:[mk(c,cal,'Calentamiento: movilidad y toques con balón')],p:[mk(a,m1,'Tarea principal 1 (elige una de la biblioteca)'),mk(b,m2,'Tarea principal 2 (elige una de la biblioteca)'),mk(f,fin,'Juego final (elige una de la biblioteca)')],v:vue?[mk(v,vue,'Vuelta a la calma: estiramientos suaves')]:[]};
+ const fx=Object.keys(TIPOSE).includes(foco)?TIPOSE[foco].n:foco;
+ const mm=k=>mt.o[k]||0;
+ let mot=mt.n?`${auto?'Foco automático':'Foco elegido'}: ${fx.toLowerCase()}. En las últimas 3 semanas (${mt.n} ${mt.n==1?'sesión':'sesiones'} antes del ${fmt(fecha)}) llevas ${mm(foco)} min de ${fx.toLowerCase()}`+(otros.length||cand.length>1?' frente a '+cand.filter(k=>k!==foco).map(k=>mm(k)+' min de '+TIPOSE[k].n.toLowerCase()).join(' y '):'')+'.':`${auto?'Foco automático':'Foco elegido'}: ${fx.toLowerCase()}. No hay sesiones en las 3 semanas anteriores al ${fmt(fecha)}, así que empiezo por este foco.`;
+ mot+=' Se evitan las tareas usadas en los últimos '+PS_REP+' días y se prioriza la que lleva más tiempo sin hacerse.';
+ if(par)mot+=vis?` Partido el ${fmt(par.p.fecha)}${par.p.rival?' contra '+par.p.rival:''} (en ${par.d} día${par.d==1?'':'s'}): sesión de víspera, de baja intensidad. Usa el juego final para ensayar lo que quieres ver ante ese rival.`:` Partido el ${fmt(par.p.fecha)}${par.p.rival?' contra '+par.p.rival:''} (en ${par.d} días): sesión con carga normal, aún queda margen para recuperar.`;
+ const mats=[...new Set(Object.values(parts).flat().map(x=>tareaDe(x)).filter(Boolean).flatMap(t=>String(t.material||'').split(/[,;]/).map(s=>s.trim()).filter(Boolean)))].slice(0,10).join(', ');
+ PS={fecha,hora:o.hora||'18:00',dur,cat:o.cat||'Benjamín',foco,obj:(auto?'':'')+'Trabajo '+(foco==='con'?'de control y pase':foco==='ofe'?'ofensivo':foco==='def'?'defensivo':fx.toLowerCase()),micro:mot,mat:mats||'Balones, conos, petos',parts,par,vis,uso,mt};
+ return PS}
+function psCands(k,i){const f=PS.fecha,ty=k==='c'?'cal':k==='v'?'vue':null;const cur=PS.parts[k][i];const T=S.tareas||[];let pool;
+ if(k==='c')pool=T.filter(t=>t.tipo==='cal'||psTipo(t)==='cal');else if(k==='v')pool=T.filter(t=>t.tipo==='vue'||psTipo(t)==='vue');
+ else{const own=cur&&tareaDe(cur);const ty2=own?psTipo(own):PS.foco;pool=T.filter(t=>psTipo(t)===ty2||psTipo(t)===PS.foco)}
+ const usados=new Set(Object.values(PS.parts).flat().map(x=>x.tid).filter(Boolean));
+ return psRank(pool.filter(t=>!usados.has(t.id)||(cur&&cur.tid===t.id)),f,PS.uso)}
+function psCambiar(k,i){const L=psCands(k,i).filter(t=>!(PS.parts[k][i]&&PS.parts[k][i].tid===t.id));if(!L.length){toast('No hay más tareas parecidas');return}
+ PS.cic=PS.cic||{};const key=k+i;const n=(PS.cic[key]||0)%L.length;PS.cic[key]=n+1;const t=L[n],m=PS.parts[k][i].m;PS.parts[k][i]={t:t.titulo,m,tid:t.id};psBorrador()}
+function psTag(x,k){const T=tareaDe(x);if(!T)return'';const ty=psTipo(T,k||'p');const o=TIPOSE[ty]||TIPOSE.sin;return`<span class="tag" style="background:${o.c}22;color:${o.c};margin-left:6px">${o.n}</span>`}
+function psBorrador(){const P=PS,nom={c:'Calentamiento',p:'Parte principal',v:'Vuelta a la calma'};
+ const fil=['c','p','v'].map(k=>!P.parts[k].length?'':`<div class="fh" style="margin-top:10px">${nom[k].toUpperCase()}</div>`+P.parts[k].map((x,i)=>`<div style="margin:6px 0;padding:8px 10px;border:1px solid var(--line,#e2e8f0);border-radius:10px"><div><b>${esc(x.t)}</b></div><div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap">${psTag(x,k).replace('margin-left:6px','margin:0')}${k==='p'&&i===2?'<span class="muted">juego final</span>':''}<span class="muted">${x.m} min</span><button type="button" class="btn alt sm" style="margin:0 0 0 auto" onclick="psCambiar('${k}',${i})">Cambiar</button></div></div>`).join('')).join('');
+ openModal(`<div class="mh"><h3>Sesión propuesta</h3><button class="icon-btn" aria-label="Cerrar" onclick="closeModal()">×</button></div><p style="margin:0 0 6px"><b>${esc(fmt(P.fecha))}</b> · ${esc(P.hora)} · ${P.dur} min · ${esc(P.cat)}</p><p class="muted" style="margin:0 0 6px;font-size:13px">${esc(P.micro)}</p>${fil}<div class="row" style="margin-top:14px;flex-wrap:wrap"><button type="button" class="btn alt" onclick="modalProponer(true)">Volver</button><button type="button" class="btn alt" onclick="psGuardar(true)">Guardar e imprimir</button><button type="button" class="btn" onclick="psGuardar(false)">Guardar sesión</button></div>`)}
+function psGuardar(imp){const P=PS;if(!P)return;const idn=id();S.sesiones.push({id:idn,fecha:P.fecha,hora:P.hora,dur:P.dur,cat:P.cat,obj:P.obj,micro:P.micro,mat:P.mat,parts:JSON.parse(JSON.stringify(P.parts)),propuesta:1});save();closeModal();if(tab==='sesiones'||tab==='calendario'||tab==='inicio')R[tab]();toast('Sesión guardada');if(imp)setTimeout(()=>imprimirSesiones([idn]),200)}
+function modalProponer(keep){if(!(S.tareas||[]).length){toast('Primero añade tareas a la biblioteca');return}
+ const ss=new Set((S.sesiones||[]).map(s=>s.fecha));let d=addD(todayS(),1);for(let n=0;n<30;n++){const w=new Date(d+'T12:00:00').getDay();if((w===2||w===4)&&!ss.has(d))break;d=addD(d,1)}
+ const v=keep&&PS?PS:{fecha:d,hora:'18:00',dur:60,cat:((S.sesiones||[]).slice(-1)[0]||{}).cat||'Benjamín',foco:'auto'};
+ openModal(`<div class="mh"><h3>Proponer sesión</h3><button class="icon-btn" aria-label="Cerrar" onclick="closeModal()">×</button></div><p class="muted" style="margin-top:0">La app mira las semanas anteriores a ese día y arma una sesión con tareas de tu biblioteca. Después puedes cambiar cualquier tarea.</p><form id="psf"><div class="row" style="flex-wrap:wrap"><label style="flex:1;min-width:130px">Día<input type="date" name="fecha" value="${v.fecha}" required></label><label style="flex:1;min-width:100px">Hora<input type="time" name="hora" value="${v.hora||'18:00'}"></label></div><div class="row" style="flex-wrap:wrap"><label style="flex:1;min-width:130px">Duración (min)<input type="number" name="dur" min="30" max="120" step="5" value="${v.dur}" required></label><label style="flex:1;min-width:130px">Foco<select name="foco"><option value="auto">Automático (según las semanas hechas)</option><option value="con">Control y pase</option><option value="ofe">Ofensivo</option><option value="def">Defensivo</option></select></label></div><input type="hidden" name="cat" value="${esc(v.cat)}"><div class="row" style="margin-top:12px"><button class="btn" type="submit">Proponer</button></div></form>`);
+ const f=document.getElementById('psf');f.foco.value=v.foco&&['auto','con','ofe','def'].includes(v.foco)?(v.foco):'auto';
+ f.onsubmit=e=>{e.preventDefault();const d=fd(f);PS=null;psGenera({fecha:d.fecha,hora:d.hora,dur:Math.max(30,+d.dur||60),cat:d.cat,foco:d.foco});PS.focoSel=d.foco;psBorrador()}}
+{const _rsp=R.sesiones;R.sesiones=function(){_rsp.apply(this,arguments);const x=document.getElementById('btnImpSes');if(x&&!document.getElementById('btnPropSes')){const y=document.createElement('button');y.type='button';y.id='btnPropSes';y.className='btn alt';y.style.margin='0 8px 0 0';y.textContent='Proponer sesión';y.onclick=()=>modalProponer();x.before(y)}}}
 </script>
 </body></html>

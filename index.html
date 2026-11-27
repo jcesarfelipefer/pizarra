@@ -221,6 +221,22 @@ details.hcat .hgrid{padding:0 14px 14px}
 .kpis{grid-template-columns:repeat(3,1fr)!important}
 @media(max-width:700px){.kpis{grid-template-columns:repeat(2,1fr)!important}}
 html[data-theme=dark]{--bg:#070b16;--surface:#0e1527;--surface2:#16203a;--ink:#e8eefa;--muted:#93a4c4;--line:#1f2c4a;--accent:#5b9bff;--accent-ink:#04122b;--accent-soft:#15285a;--danger:#f87171}
+/* ====== IMPRIMIR SESIONES ====== */
+#printSes{display:none}
+@media print{body.impSes>*:not(#printSes){display:none!important}body.impSes #printSes{display:block!important}body.impSes{background:#fff!important}
+#printSes{font-family:Satoshi,system-ui,Arial,sans-serif;color:#0b1630;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+#printSes .pgs{page-break-after:always;break-after:page}#printSes .pgs:last-child{page-break-after:auto;break-after:auto}
+#printSes .ph{background:linear-gradient(135deg,#0a1440,#2563eb);color:#fff;border-radius:12px;padding:14px 18px;margin-bottom:10px}
+#printSes .ph small{opacity:.85;letter-spacing:.04em;text-transform:uppercase;font-size:10px}
+#printSes .ph h1{margin:2px 0 4px;font-size:20px;color:#fff}#printSes .ph div{font-size:12px;opacity:.92}
+#printSes .pm{font-size:12px;margin:0 0 8px}#printSes .pm b{color:#1536a8}
+#printSes .pp{margin:10px 0 4px;font-size:13px;font-weight:800;color:#fff;background:#2563eb;border-radius:6px;padding:4px 10px;break-after:avoid}
+#printSes .pt{display:grid;grid-template-columns:44% 1fr;gap:12px;padding:8px 0;border-bottom:1px solid #d4def0;break-inside:avoid;page-break-inside:avoid}
+#printSes .pt svg{width:100%;height:auto;border-radius:8px;display:block}
+#printSes .pt h4{margin:0 0 3px;font-size:13px}#printSes .pt p{margin:0 0 3px;font-size:11px;line-height:1.35}
+#printSes .pt .mn{font-weight:700;color:#1536a8}
+#printSes .pf{margin-top:14px;font-size:10px;color:#586a8a;text-align:right}
+@page{size:A4;margin:12mm}}
 </style>
 </head>
 <body>
@@ -1985,5 +2001,23 @@ let hfTipo='';
  orden.filter(k=>grp[k]&&(!hfTipo||hfTipo===k)).forEach(k=>{const dt=document.createElement('details');dt.className='hcat';if(q||hfTipo)dt.open=true;const T=TIPOSE[k]||{n:k,c:'#94a3b8'};dt.innerHTML=`<summary><span class="dot" style="background:${T.c}"></span>${esc(T.n)}<span class="cnt">${grp[k].length} ${grp[k].length==1?'tarea':'tareas'}</span></summary>`;const gg=document.createElement('div');gg.className='hgrid';gg.dataset.agr='1';grp[k].forEach(c=>gg.appendChild(c));dt.appendChild(gg);frag.appendChild(dt)});
  if(!frag.children.length){return}
  g.replaceWith(frag)}}
+
+/* ====== IMPRIMIR SESIONES (una o varias) ====== */
+function htmlImpSesion(s){const P={c:'Calentamiento',p:'Parte principal',v:'Vuelta a la calma'};const tot=Object.values(s.parts||{}).flat().reduce((a,t)=>a+(+t.m||0),0);
+ const f=(l,v)=>v?`<p><b>${l}:</b> ${esc(String(v))}</p>`:'';
+ const partes=Object.entries(P).map(([k,n])=>{const L=(s.parts&&s.parts[k])||[];if(!L.length)return'';const m=L.reduce((a,t)=>a+(+t.m||0),0);
+  return`<div class="pp">${n} · ${m} min</div>`+L.map(t=>{const T=tareaDe(t);return`<div class="pt"><div>${T?svgTarea(T.els||[],T.fondo,'pr'+(++svgN)+'_',-1):''}</div><div><h4>${esc(t.t)} <span class="mn">· ${t.m} min</span></h4>${T?f('Descripción',T.descripcion)+f('Espacio',T.espacio)+f('Material',T.material)+f('Normas',T.normas)+f('Variantes',T.variantes)+f('Observaciones',T.observaciones):''}</div></div>`}).join('')}).join('');
+ return`<section class="pgs"><div class="ph"><small>Sesión de entrenamiento · ${esc(S.equipo||'Racing Villaverde')}</small><h1>${esc(s.obj)||'Sin objetivo'}</h1><div>${esc(fmt(s.fecha))}${s.hora?' · '+esc(s.hora):''} · ${esc(s.cat||'')} · ${tot||s.dur||0} min</div></div>${s.mat?`<p class="pm"><b>Material:</b> ${esc(s.mat)}</p>`:''}${s.micro?`<p class="pm"><b>Notas:</b> ${esc(s.micro)}</p>`:''}${partes||'<p class="pm">Esta sesión todavía no tiene tareas.</p>'}</section>`}
+function imprimirSesiones(ids){const L=(S.sesiones||[]).filter(s=>ids.includes(s.id)).sort((a,b)=>(a.fecha+(a.hora||''))<(b.fecha+(b.hora||''))?-1:1);if(!L.length){toast('Elige al menos una sesión');return}
+ let box=document.getElementById('printSes');if(!box){box=document.createElement('div');box.id='printSes';document.body.appendChild(box)}
+ box.innerHTML=L.map(htmlImpSesion).join('');closeModal&&closeModal();
+ const fin=()=>{document.body.classList.remove('impSes');window.removeEventListener('afterprint',fin)};window.addEventListener('afterprint',fin);document.body.classList.add('impSes');setTimeout(()=>window.print(),350)}
+function modalImprimir(){const hoyC=todayS(),L=[...(S.sesiones||[])].sort((a,b)=>(a.fecha+(a.hora||''))<(b.fecha+(b.hora||''))?-1:1);
+ const prep=s=>Object.values(s.parts||{}).flat().length>0;
+ openModal(`<div class="mh"><h3>Imprimir sesiones</h3><button class="icon-btn" aria-label="Cerrar" onclick="closeModal()">×</button></div><p class="muted" style="margin-top:0">Elige las sesiones que quieres imprimir. Cada una sale en su propia hoja, con los dibujos de las tareas.</p><div class="row" style="margin:0 0 8px"><button class="btn alt sm" style="margin:0" onclick="impSel('prox')">Próximas preparadas</button><button class="btn alt sm" style="margin:0" onclick="impSel('todas')">Todas</button><button class="btn alt sm" style="margin:0" onclick="impSel('ninguna')">Ninguna</button></div><div id="impList" style="max-height:48vh;overflow:auto">${L.map(s=>`<label style="display:flex;gap:10px;align-items:flex-start;padding:8px 6px;border-bottom:1px solid var(--line);cursor:pointer"><input type="checkbox" class="impck" value="${s.id}" data-prox="${s.fecha>=hoyC&&prep(s)?1:0}" ${s.fecha>=hoyC&&prep(s)?'checked':''} style="margin-top:3px;width:auto"><span><b>${esc(fmt(s.fecha))}${s.hora?' · '+esc(s.hora):''}</b> ${esc(s.cat||'')}<br><span class="muted" style="font-size:13px">${esc(s.obj||'Sin objetivo')}${prep(s)?'':' · sin tareas'}</span></span></label>`).join('')||'<p class="muted">No hay sesiones.</p>'}</div><div class="row" style="margin-top:12px"><button class="btn" style="margin:0" onclick="imprimirSesiones([...document.querySelectorAll('.impck:checked')].map(i=>i.value))">Imprimir seleccionadas</button></div>`)}
+function impSel(m){document.querySelectorAll('.impck').forEach(i=>{i.checked=m==='todas'||(m==='prox'&&i.dataset.prox==='1')})}
+{const _rsi=R.sesiones;R.sesiones=function(){_rsi.apply(this,arguments);const b=document.getElementById('btnNuevaSes');const h=b&&b.parentElement;
+ if(h&&!document.getElementById('btnImpSes')){const x=document.createElement('button');x.type='button';x.id='btnImpSes';x.className='btn alt';x.style.margin='0';x.textContent='Imprimir';x.onclick=modalImprimir;b.after(x);if(!h.querySelector('.acts2')){b.style.marginRight='8px'}}
+ document.querySelectorAll('#lista .card,#lista .scard').forEach(c=>{if(c.querySelector('.btnImpUna'))return;const m=(c.innerHTML.match(/programarSes\('([^']+)'\)/)||[])[1];if(!m)return;const bt=document.createElement('button');bt.type='button';bt.className='btn alt noprint btnImpUna';bt.textContent='Imprimir';bt.onclick=()=>imprimirSesiones([m]);const ref=c.querySelector('button[onclick^="programarSes"]');if(ref)ref.before(bt)})}}
 </script>
 </body></html>
